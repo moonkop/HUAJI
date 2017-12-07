@@ -12,12 +12,19 @@ var username;
 var userid;
 var sec;
 var TimerArea;
-var statusBar;
+var LogArea;
 var countInterval;
 var homeworkTimer;
 
 function log(str) {
-	statusBar.innerHTML += str + "<br>";
+	LogArea.innerHTML += str + "<br>";
+}
+
+function initLogArea() {
+	var str =
+		'<div id="mask" style="background: rgba(255,255,255,0.7);float: left;z-index: 2;position: absolute;">	<div id="log-body" style="min-width: 100px;width: auto;min-height: 0;height: auto;border: 1px solid #DDDDDD;opacity: 2;"></div>	</div>';
+	$(".top").append(str);
+	LogArea = document.getElementById("log-body");
 }
 
 function getStrs() {
@@ -247,7 +254,7 @@ function RequestReload() {
 function logtoBackgroundPage(str, noforegroundlog) {
 	noforegroundlog = arguments[1] ? noforegroundlog : false;
 	if (!noforegroundlog) {
-		statusBar.innerHTML += str + "<br>";
+		log(str);
 	}
 	sendToBackgroud({
 		action: "Log",
@@ -274,11 +281,18 @@ function sendToBackgroud(data) {
 function autoComplete() {
 	ClearAllTimers();
 	deleteFlashDiv();
-	statusBar = document.getElementsByClassName("top")[0];
+	initLogArea();
 	logtoBackgroundPage("starting");
 	getStrs();
 	dectHomework();
 	postAll();
 	changeNavi();
 	// var aliveSenderTimer=setInterval(SendAlive,30000);
+}
+
+//----------------------test-functions---------------
+
+function test1() {}
+function test2() {
+	ClearAllTimers();
 }
