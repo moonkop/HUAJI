@@ -117,4 +117,21 @@ function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 
 	return IsCorrect;
 }
-doAssignments();
+
+function inject() {
+	var script = document.createElement("script");
+	script.innerHTML = 'window.postMessage(examStudentExerciseSerialList, "*");';
+	document.body.appendChild(script);
+}
+
+window.addEventListener(
+	"message",
+	function(event) {
+		// We only accept messages from ourselves
+		if (event.source != window) return;
+		examStudentExerciseSerialList = event.data;
+		doAssignments();
+	},
+	false
+);
+inject();

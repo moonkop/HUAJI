@@ -2,8 +2,8 @@ var tabid;
 var dectLoadFinishedTimer;
 var defaultLessonType = "";
 
-function test1() {
-	chrome.tabs.executeScript(null, { code: "test1();" });
+function test2() {
+	chrome.tabs.executeScript(null, { file: "communicationTest.js" });
 }
 function doAssignments() {
 	chrome.tabs.executeScript(null, { file: "codeAssignment.js" });

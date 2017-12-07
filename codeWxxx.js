@@ -282,7 +282,7 @@ function sendToBackgroud(data) {
 	data.UserId = userid;
 	data.UserName = username;
 	data.lessonType = "Wxxx";
-//	chrome.runtime.sendMessage(data);
+	chrome.runtime.sendMessage(data);
 }
 
 function autoComplete() {
