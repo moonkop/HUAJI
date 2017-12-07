@@ -161,6 +161,8 @@ function postOneData(PostTime) {
 				currentPostTime += 200;
 				console.log("result ok" + PostTime);
 				PostFinished = 1;
+			} else {
+				console.dir(result);
 			}
 		},
 		error: function() {
@@ -180,6 +182,8 @@ function postData(x) {
 		success: function(result) {
 			if (result == "ok") {
 				console.log("result ok" + time);
+			} else {
+				console.dir(result);
 			}
 		}
 	});
@@ -212,9 +216,12 @@ function getfinish() {
 		success: function(result) {
 			if (result == "complete") {
 				log("lessonIsCompelete");
+				console.dir(result);
 				RequestReload();
 			} else {
 				log("finishing failed");
+				console.dir(result);
+
 				RequestReload();
 			}
 		}
@@ -275,7 +282,7 @@ function sendToBackgroud(data) {
 	data.UserId = userid;
 	data.UserName = username;
 	data.lessonType = "Wxxx";
-	chrome.runtime.sendMessage(data);
+//	chrome.runtime.sendMessage(data);
 }
 
 function autoComplete() {
