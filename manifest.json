@@ -1,28 +1,31 @@
 ﻿{
 	"name": "学习软件",
-	"version": "2.5.0",
-	"description" : "一个会自动学习视频的软件.",
-  	"permissions": [
-    "tabs", "http://*/*", "https://*/*",
-		"background","notifications"
-
+	"version": "3.0.0",
+	"description": "一个会自动学习视频的软件.",
+	"permissions": [
+		"tabs",
+		"http://*/*",
+		"https://*/*",
+		"background",
+		"notifications"
 	],
-	"content_scripts":[
+	"content_scripts": [
 		{
-			"matches":["http://wxxx.hytc.edu.cn/*"],
-			"js":["jquery-1.3.2.min.js"],
-			"run_at":"document_start"
+			"matches": ["http://wxxx.hytc.edu.cn/*"],
+			"js": ["jquery-1.3.2.min.js"],
+			"run_at": "document_start"
 		}
 	],
-	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+	"content_security_policy":
+		"script-src 'self' 'unsafe-eval'; object-src 'self'",
 	"manifest_version": 2,
 	"browser_action": {
-      "default_title": "点我点我",
-      "default_icon": "hj.png",
-      "default_popup": "popup.html"
-  },
-	"background":{
-		"scripts":["background.js"],
+		"default_title": "我去你妈的网修课",
+		"default_icon": "icon.png",
+		"default_popup": "popup.html"
+	},
+	"background": {
+		"scripts": ["background.js"],
 		"persistent": true
 	}
 }
