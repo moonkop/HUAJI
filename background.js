@@ -69,6 +69,7 @@ function getFinish() {
 function log(str) {
 	console.log(str);
 }
+function UpdateStatus(msg, tab) {}
 
 chrome.runtime.onMessage.addListener(function(msg, sender) {
 	tabid = sender.tab.id;
@@ -123,7 +124,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender) {
 			defaultLessonType = msg.lessonType;
 
 			setTimeout(function() {
-				tabUrl[sender.tab.id] = sender.tab.url;
 				dectLoadFinishedTimer = setInterval(
 					dectLoaded(sender.tab, msg.lessonType),
 					1000
@@ -131,7 +131,8 @@ chrome.runtime.onMessage.addListener(function(msg, sender) {
 			}, 10000);
 			break;
 
-		case "Alive":
+		case "Status":
+			UpdateStatus(msg, sender);
 			break;
 	}
 });
@@ -147,10 +148,12 @@ function dectLoaded(tab, lessonType) {
 }
 
 function startNewWxxx() {
+	defaultLessonType = "Wxxx";
 	Inject(null, "Wxxx");
 }
 
 function startNewSzjy() {
+	defaultLessonType = "Szjy";
 	Inject(null, "Szjy");
 }
 

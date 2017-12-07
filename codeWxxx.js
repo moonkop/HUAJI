@@ -274,7 +274,7 @@ function homeworkTick() {
 function sendToBackgroud(data) {
 	data.UserId = userid;
 	data.UserName = username;
-	data.lessonType = "Szjy";
+	data.lessonType = "Wxxx";
 	chrome.runtime.sendMessage(data);
 }
 
