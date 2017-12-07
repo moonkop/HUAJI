@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	divs.addEventListener("click", bg.deleteFlashDiv);
 });
 document.addEventListener("DOMContentLoaded", function() {
-	var divs = document.getElementById("test1");
-	divs.addEventListener("click", bg.test1);
+	var divs = document.getElementById("doAssignments");
+	divs.addEventListener("click", bg.doAssignments);
 });
 document.addEventListener("DOMContentLoaded", function() {
 	var divs = document.getElementById("test2");

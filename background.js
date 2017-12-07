@@ -5,8 +5,8 @@ var defaultLessonType = "";
 function test1() {
 	chrome.tabs.executeScript(null, { code: "test1();" });
 }
-function test2() {
-	chrome.tabs.executeScript(null, { code: "test2();" });
+function doAssignments() {
+	chrome.tabs.executeScript(null, { file: "codeAssignment.js" });
 }
 
 function Inject(id, lessonType) {
