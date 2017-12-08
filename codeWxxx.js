@@ -213,6 +213,7 @@ function ClearAllTimers() {
 }
 var homeworkIsAlerted = 0;
 function dectHomework() {
+	homeworkIsAlerted = -1;
 	if (homeworkIsAlerted < 5) {
 		homeworkTick();
 		homeworkTimer = setInterval(homeworkTick, 60000);
@@ -228,11 +229,11 @@ function SendAlive() {
 }
 
 function goTohomeWork() {
-	//window.location.href = "";
+	$("center").eq(2).children().eq(0).click();
 	logtoBackgroundPage("going to homework");
 	sendToBackgroud({
 		action: "WaitInject",
-		timeout: 10,
+		timeout: 3000,
 		script: "codeAssignment.js"
 	});
 }
@@ -243,7 +244,7 @@ function ReloadWaitingForInject() {
 
 	sendToBackgroud({
 		action: "WaitInject",
-		timeout: 10,
+		timeout: 3000,
 		script: "codeWxxx.js"
 	});
 }

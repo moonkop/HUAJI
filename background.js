@@ -117,7 +117,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 				type: "basic",
 				title: "写作业！",
 				message: msg.UserId + "   " + msg.UserName,
-				iconUrl: "hj.png",
+				iconUrl: "icon.png",
 				requireInteraction: true
 			};
 			sendNotification(opt);
