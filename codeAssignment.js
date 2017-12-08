@@ -9,7 +9,7 @@ var saveAnswerURL;
 var answerMap = ["A", "B", "C", "D"];
 
 function doAssignments() {
-	$.each(examStudentExerciseSerialList, function(index, value) {
+	$.each(examStudentExerciseSerialList, function (index, value) {
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
 	handExam();
@@ -18,25 +18,30 @@ function doAssignments() {
 
 function handExam() {
 	getParams();
-	$.ajax({
-		type: "POST",
-		async: false,
-		url:
-			"/student/exam/manageExam.do?method=handExam&examReplyId=" +
-			examReplyId +
-			"&examId=" +
-			examId +
-			"&taskStudentId=",
-		data: {},
-		success: function(result) {
-			console.log("handExam" + result);
-		},
-		dataType: "json"
-	});
+	var PostSucceed=false;
+	while(PostSucceed==false)
+	{
+		$.ajax({
+			type: "POST",
+			async: false,
+			url:
+				"/student/exam/manageExam.do?method=handExam&examReplyId=" +
+				examReplyId +
+				"&examId=" +
+				examId +
+				"&taskStudentId=",
+			data: {},
+			success: function (result) {
+				console.log("handExam" + result);
+				PostSucceed=true;
+			},
+			dataType: "json"
+		});
+	}
 }
 
 function tryCurrentAnswers() {
-	$.each(answerMap, function(index, value) {
+	$.each(answerMap, function (index, value) {
 		saveCurrentAnswer(value);
 		console.log("tryAnswers" + value);
 		var IsCorrect = getCurrentAnswerInfo();
@@ -47,7 +52,8 @@ function tryCurrentAnswers() {
 }
 
 function tryAnswers(exerciseId1, examStudentExerciseId1) {
-	$.each(answerMap, function(index, value) {
+
+	$.each(answerMap, function (index, value) {
 		saveAnswer(value, exerciseId1, examStudentExerciseId1);
 		console.log("tryAnswers" + value);
 		var IsCorrect = getAnswerInfo(exerciseId1, examStudentExerciseId1);
@@ -70,25 +76,31 @@ function saveCurrentAnswer(AnswerOption) {
 }
 function saveAnswer(AnswerOption, exerciseId1, examStudentExerciseId1) {
 	getParams();
-	$.ajax({
-		type: "POST",
-		async: false,
-		url: saveAnswerURL,
-		data: {
-			examReplyId: examReplyId,
-			examId: examId,
-			teachingTaskId: teachingTaskId,
+	var PostSucceed = false;
 
-			examStudentExerciseId: examStudentExerciseId1,
-			exerciseId: exerciseId1,
+	while (PostSucceed == false) {
+		$.ajax({
+			type: "POST",
+			async: false,
+			url: saveAnswerURL,
+			data: {
+				examReplyId: examReplyId,
+				examId: examId,
+				teachingTaskId: teachingTaskId,
 
-			DXanswer: AnswerOption
-		},
-		success: function(result) {
-			console.log("saveAnswer" + result);
-		},
-		dataType: "json"
-	});
+				examStudentExerciseId: examStudentExerciseId1,
+				exerciseId: exerciseId1,
+
+				DXanswer: AnswerOption
+			},
+			success: function (result) {
+				console.log("saveAnswer" + result);
+				PostSucceed = true;
+			},
+			dataType: "json"
+		});
+	}
+
 }
 
 function getCurrentAnswerInfo() {
@@ -109,7 +121,7 @@ function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 			examStudentExerciseId1, //后台处理程序
 		dataType: "json", //接受数据格式
 		async: false,
-		success: function(result) {
+		success: function (result) {
 			IsCorrect = result.examAnswer.correctFlag;
 		}
 	});
@@ -126,7 +138,7 @@ function inject() {
 
 window.addEventListener(
 	"message",
-	function(event) {
+	function (event) {
 		// We only accept messages from ourselves
 		if (event.source != window) return;
 		examStudentExerciseSerialList = event.data;
