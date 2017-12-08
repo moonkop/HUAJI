@@ -237,7 +237,6 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 }
 
 function GoBackToVideo() {
-	$(".icon.videoIcon").parent().click();
 	sendToBackgroud(
 		{
 			action: "WaitInject",
@@ -245,10 +244,10 @@ function GoBackToVideo() {
 			script: "codeWxxx.js"
 		}
 	);
+	$(".icon.videoIcon").parent().click();
+
 }
 function sendToBackgroud(data) {
-	data.UserId = userid;
-	data.UserName = username;
 	data.lessonType = "Wxxx";
 	chrome.runtime.sendMessage(data);
 }
