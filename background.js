@@ -25,6 +25,12 @@ function getTabStatus(tabid) {
 	})
 }
 
+function InjectScript(id, script) {
+	chrome.tabs.executeScript(id, { file: "jquery-1.3.2.min.js" });
+	chrome.tabs.executeScript(id, { file: script });
+}
+
+
 function Inject(id, lessonType) {
 	chrome.tabs.executeScript(id, { file: "jquery-1.3.2.min.js" });
 	switch (lessonType) {
@@ -162,7 +168,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 				"  " +
 				msg.UserName +
 				"   WaitingInject" + "Timeout=" + msg.timeout + "    script=" + msg.script);
-
+			setTimeout(() => {
+				WaitingForInjection(tabid, msg.script);
+			}, msg.timeout);
 			break;
 		case "Status":
 			UpdateStatus(msg, sender);
@@ -172,6 +180,18 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 
 var tabUrl = Array();
 
+function WaitingForInjection(tabid, script) {
+	var WaitingTimer = setInterval(function () {
+		chrome.tabs.get(tabid, function (tab) {
+			console.log("" + tabid + tab.status);
+			if (tab.status == "complete") {
+				console.log(tab);
+				clearInterval(WaitingTimer);
+				InjectScript(tab.id, script);
+			}
+		});
+	}, 1000);
+}
 
 function dectLoaded(tabid, lessonType) {
 	chrome.tabs.get(tabid, function (tab) {

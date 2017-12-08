@@ -38,8 +38,7 @@ var DUOanswerMap = [
 	["B"],
 	["C"],
 	["D"],
-	["E"],
-
+	["E"]
 ]
 var AnswerTypeMap = {
 	"1": "DX",
@@ -50,15 +49,17 @@ function doAssignments() {
 	getParams();
 	$.each(examStudentExerciseSerialList, function (index, value) {
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
+		console.log("working on No." + (index + 1));
 	});
 	handExam();
-	window.history.back();
+	GoBackToVideo();
 }
 
 function handExam() {
 	getParams();
 	var PostSucceed = false;
-	while (PostSucceed == false) {
+	var failtime = 0;
+	while (PostSucceed == false && failtime < 100) {
 		$.ajax({
 			type: "POST",
 			async: false,
@@ -75,6 +76,8 @@ function handExam() {
 			},
 			error: function () {
 				console.log("handExamFailed");
+				failtime++;
+
 			},
 			dataType: "json"
 		});
@@ -114,11 +117,7 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 			break;
 	}
 
-
-
-
 	$.each(answerMap, function (index, value) {
-
 		var basicData = {
 			examReplyId: examReplyId,
 			examId: examId,
@@ -130,7 +129,7 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 		console.log("tryAnswers " + value);
 		var IsCorrect = getAnswerInfo(exerciseId1, examStudentExerciseId1);
 		if (IsCorrect == true) {
-			console.log("Answer is " + value + "---------------------");
+			console.log("---------  Answer is " + value + "---------------------");
 			return false;
 		}
 	});
@@ -171,7 +170,8 @@ function saveDUOAnswer(AnswerOption, basicData) {
 function postAnswer(data) {
 	getParams();
 	var PostSucceed = false;
-	while (PostSucceed == false) {
+	var failtime = 0;
+	while (PostSucceed == false && failtime < 100) {
 		$.ajax({
 			type: "POST",
 			async: false,
@@ -181,13 +181,12 @@ function postAnswer(data) {
 				PostSucceed = true;
 			},
 			error: function () {
-				PostSucceed = true;
 				console.log("saveAnswerFailed");
+				failtime++;
 			},
 			dataType: "json"
 		});
 	}
-
 }
 
 
@@ -237,7 +236,9 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 	return type;
 }
 
-
+function GoBackToVideo() {
+	$(".icon.videoIcon").parent().click();
+}
 
 function inject() {
 	var script = document.createElement("script");

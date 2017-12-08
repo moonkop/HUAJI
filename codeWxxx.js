@@ -18,6 +18,7 @@ var homeworkTimer;
 
 function log(str) {
 	LogArea.innerHTML += str + "<br>";
+	console.log(str);
 }
 
 function initLogArea() {
@@ -70,10 +71,10 @@ function init() {
 	} catch (error) {
 		logtoBackgroundPage(
 			"Critical error: DataStr or UrlStr undefined" +
-				error.message +
-				" Reloading"
+			error.message +
+			" Reloading"
 		);
-		RequestReload();
+		ReloadWaitingForInject();
 	}
 
 	try {
@@ -88,31 +89,6 @@ function init() {
 	logtoBackgroundPage("urlStr=" + urlStr);
 }
 
-function getToEnd() {
-	log("skipping to end");
-	var counts = videoLength / 200;
-	for (var i = 1; i < counts; i++) {
-		postData(i * 200);
-	}
-	var mydate = new Date();
-	var ts = mydate.getTime();
-	var newdate = new Date();
-	newdate.setTime(ts + 1000 * (videoLength + 20));
-	logtoBackgroundPage(
-		"skipping finished on " +
-			mydate.getHours() +
-			":" +
-			mydate.getMinutes() +
-			":" +
-			mydate.getSeconds() +
-			"   Completing on " +
-			newdate.getHours() +
-			":" +
-			newdate.getMinutes() +
-			":" +
-			newdate.getSeconds()
-	);
-}
 var PostTimer;
 function postAll() {
 	log("skipping to end");
@@ -131,17 +107,17 @@ function postTick() {
 
 		logtoBackgroundPage(
 			"skipping finished on " +
-				mydate.getHours() +
-				":" +
-				mydate.getMinutes() +
-				":" +
-				mydate.getSeconds() +
-				"   Completing on " +
-				newdate.getHours() +
-				":" +
-				newdate.getMinutes() +
-				":" +
-				newdate.getSeconds()
+			mydate.getHours() +
+			":" +
+			mydate.getMinutes() +
+			":" +
+			mydate.getSeconds() +
+			"   Completing on " +
+			newdate.getHours() +
+			":" +
+			newdate.getMinutes() +
+			":" +
+			newdate.getSeconds()
 		);
 
 		return;
@@ -156,7 +132,7 @@ function postOneData(PostTime) {
 		url: urlStr,
 		type: "POST",
 		data: dataStr + PostTime,
-		success: function(result) {
+		success: function (result) {
 			if (result == "ok") {
 				currentPostTime += 200;
 				console.log("result ok" + PostTime);
@@ -165,7 +141,7 @@ function postOneData(PostTime) {
 				console.dir(result);
 			}
 		},
-		error: function() {
+		error: function () {
 			console.log("result error " + PostTime);
 			PostFinished = 1;
 		}
@@ -179,7 +155,7 @@ function postData(x) {
 		url: urlStr,
 		type: "POST",
 		data: dataStr + time,
-		success: function(result) {
+		success: function (result) {
 			if (result == "ok") {
 				console.log("result ok" + time);
 			} else {
@@ -213,16 +189,15 @@ function getfinish() {
 		type: "POST",
 		url: urlStr,
 		data: dataStr + videoLength, //此处改为视频时间
-		success: function(result) {
+		success: function (result) {
 			if (result == "complete") {
 				log("lessonIsCompelete");
 				console.dir(result);
-				RequestReload();
+				ReloadWaitingForInject();
 			} else {
 				log("finishing failed");
 				console.dir(result);
-
-				RequestReload();
+				ReloadWaitingForInject();
 			}
 		}
 	});
@@ -252,9 +227,24 @@ function SendAlive() {
 	});
 }
 
-function RequestReload() {
+function goTohomeWork() {
+	//window.location.href = "";
+	logtoBackgroundPage("going to homework");
 	sendToBackgroud({
-		action: "RequestReload"
+		action: "WaitInject",
+		timeout: 10,
+		script: "codeAssignment.js"
+	});
+}
+
+
+function ReloadWaitingForInject() {
+	window.location.href = "";
+
+	sendToBackgroud({
+		action: "WaitInject",
+		timeout: 10,
+		script: "codeWxxx.js"
 	});
 }
 
@@ -274,7 +264,8 @@ function homeworkTick() {
 		sendToBackgroud({
 			action: "Homework"
 		});
-		homeworkIsAlerted++;
+		goTohomeWork();
+		clearInterval(homeworkTimer);
 	}
 }
 
@@ -299,7 +290,7 @@ function autoComplete() {
 
 //----------------------test-functions---------------
 
-function test1() {}
+function test1() { }
 function test2() {
 	ClearAllTimers();
 }
