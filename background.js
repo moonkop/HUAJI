@@ -3,10 +3,26 @@ var dectLoadFinishedTimer;
 var defaultLessonType = "";
 
 function test2() {
-	chrome.tabs.executeScript(null, { file: "communicationTest.js" });
+	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+		var tagtab = tabs[0];
+		RecordTabStatus(tagtab.id);
+	});
 }
 function doAssignments() {
 	chrome.tabs.executeScript(null, { file: "codeAssignment.js" });
+}
+
+var RecordTabStatusTimer;
+function RecordTabStatus(tabid) {
+	RecordTabStatusTimer = setInterval(function () {
+		getTabStatus(tabid);
+	}, 100);
+}
+
+function getTabStatus(tabid) {
+	chrome.tabs.get(tabid, function (tab) {
+		console.log(tab.status);
+	})
 }
 
 function Inject(id, lessonType) {
@@ -25,7 +41,7 @@ function ReloadCurrentTab() {
 	// chrome.tabs.getCurrent(function (tab) {
 	//     ReloadTab(tab);
 	// });
-	chrome.tabs.query({ currentWindow: true, active: true }, function(tabs) {
+	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 		var tagtab = tabs[0];
 		console.log(tagtab);
 		ReloadTab(tagtab);
@@ -40,16 +56,22 @@ function ReloadTab(tagTab) {
 	}
 
 	if (tagTab == null) {
-		setTimeout(function() {
+		setTimeout(function () {
 			dectLoadFinishedTimer = setInterval(
-				dectLoaded(null, defaultLessonType),
+				function () {
+					dectLoaded(null, defaultLessonType)
+				}
+				,
 				1000
 			);
 		}, 10000);
 	} else {
-		setTimeout(function() {
+		setTimeout(function () {
 			dectLoadFinishedTimer = setInterval(
-				dectLoaded(tagTab, defaultLessonType),
+				function () {
+					dectLoaded(tagTab.id, defaultLessonType)
+				}
+				,
 				1000
 			);
 		}, 10000);
@@ -69,9 +91,9 @@ function getFinish() {
 function log(str) {
 	console.log(str);
 }
-function UpdateStatus(msg, tab) {}
+function UpdateStatus(msg, tab) { }
 
-chrome.runtime.onMessage.addListener(function(msg, sender) {
+chrome.runtime.onMessage.addListener(function (msg, sender) {
 	tabid = sender.tab.id;
 	var time = new Date();
 	var timestr =
@@ -98,39 +120,50 @@ chrome.runtime.onMessage.addListener(function(msg, sender) {
 		case "Log":
 			log(
 				"tabId=" +
-					tabid +
-					timestr +
-					"  " +
-					msg.UserId +
-					"  " +
-					msg.UserName +
-					"   " +
-					msg.message
+				tabid +
+				timestr +
+				"  " +
+				msg.UserId +
+				"  " +
+				msg.UserName +
+				"   " +
+				msg.message
 			);
 			break;
 
 		case "RequestReload":
 			log(
 				"tabId=" +
-					tabid +
-					"  " +
-					msg.UserId +
-					"  " +
-					msg.UserName +
-					"   " +
-					"tryReloading"
+				tabid +
+				"  " +
+				msg.UserId +
+				"  " +
+				msg.UserName +
+				"   " +
+				"tryReloading"
 			);
 			chrome.tabs.executeScript(tabid, { code: "window.location.reload();" });
 			defaultLessonType = msg.lessonType;
 
-			setTimeout(function() {
+			setTimeout(function () {
 				dectLoadFinishedTimer = setInterval(
-					dectLoaded(sender.tab, msg.lessonType),
+					function () {
+						dectLoaded(sender.tab.id, msg.lessonType)
+					}
+					,
 					1000
 				);
 			}, 10000);
 			break;
+		case "WaitInject":
+			log("tabId=" + tabid +
+				"  " +
+				msg.UserId +
+				"  " +
+				msg.UserName +
+				"   WaitingInject" + "Timeout=" + msg.timeout + "    script=" + msg.script);
 
+			break;
 		case "Status":
 			UpdateStatus(msg, sender);
 			break;
@@ -139,12 +172,16 @@ chrome.runtime.onMessage.addListener(function(msg, sender) {
 
 var tabUrl = Array();
 
-function dectLoaded(tab, lessonType) {
-	if (tab.status == "complete") {
-		console.log(tab);
-		clearInterval(dectLoadFinishedTimer);
-		Inject(tab.id, lessonType);
-	}
+
+function dectLoaded(tabid, lessonType) {
+	chrome.tabs.get(tabid, function (tab) {
+		console.log(tab.status);
+		if (tab.status == "complete") {
+			console.log(tab);
+			clearInterval(dectLoadFinishedTimer);
+			Inject(tab.id, lessonType);
+		}
+	});
 }
 
 function startNewWxxx() {
