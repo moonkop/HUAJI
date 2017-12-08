@@ -238,6 +238,19 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 
 function GoBackToVideo() {
 	$(".icon.videoIcon").parent().click();
+	sendToBackgroud(
+		{
+			action: "WaitInject",
+			timeout: 3000,
+			script: "codeWxxx.js"
+		}
+	);
+}
+function sendToBackgroud(data) {
+	data.UserId = userid;
+	data.UserName = username;
+	data.lessonType = "Wxxx";
+	chrome.runtime.sendMessage(data);
 }
 
 function inject() {
