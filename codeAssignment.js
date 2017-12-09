@@ -4,6 +4,7 @@ var teachingTaskId;
 
 var examStudentExerciseId; //这两个变量每个题目都不一样 可在list中获取
 var exerciseId;
+var reloadTimeOut = 10000;
 
 var saveAnswerURL;
 var DXanswerMap = ["A", "B", "C", "D"];
@@ -52,7 +53,9 @@ function doAssignments() {
 		console.log("working on No." + (index + 1));
 	});
 	handExam();
-	GoBackToVideo();
+	setTimeout(() => {
+		GoBackToVideo();
+	}, reloadTimeOut);
 }
 
 function handExam() {
@@ -240,7 +243,7 @@ function GoBackToVideo() {
 	sendToBackgroud(
 		{
 			action: "WaitInject",
-			timeout: 3000,
+			timeout: reloadTimeOut,
 			script: "codeWxxx.js"
 		}
 	);

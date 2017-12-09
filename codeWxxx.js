@@ -4,7 +4,7 @@ if ("undefined" == typeof urlStr) {
 } else {
 	console.log("already started");
 }
-
+var reloadTimeOut = 10000;
 var videoLength;
 var urlStr;
 var dataStr;
@@ -233,18 +233,17 @@ function goTohomeWork() {
 	logtoBackgroundPage("going to homework");
 	sendToBackgroud({
 		action: "WaitInject",
-		timeout: 3000,
+		timeout: reloadTimeOut,
 		script: "codeAssignment.js"
 	});
 }
 
 
 function ReloadWaitingForInject() {
-	window.location.href = "";
-
+	$(".item.current").click();
 	sendToBackgroud({
 		action: "WaitInject",
-		timeout: 3000,
+		timeout: reloadTimeOut,
 		script: "codeWxxx.js"
 	});
 }

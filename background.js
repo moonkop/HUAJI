@@ -1,11 +1,13 @@
 var tabid;
 var dectLoadFinishedTimer;
 var defaultLessonType = "";
+var reloadTimeOut = 10000;
 
 function test2() {
 	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 		var tagtab = tabs[0];
-		RecordTabStatus(tagtab.id);
+		//	RecordTabStatus(tagtab.id);
+		WaitingForInjection(tagtab.id, "codeWxxx.js");
 	});
 }
 function doAssignments() {
@@ -115,10 +117,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 		case "Homework":
 			var opt = {
 				type: "basic",
-				title: "写作业！",
+				title: "正在完成作业",
 				message: msg.UserId + "   " + msg.UserName,
 				iconUrl: "icon.png",
-				requireInteraction: true
+				//requireInteraction: true
 			};
 			sendNotification(opt);
 			break;
@@ -181,9 +183,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 var tabUrl = Array();
 
 function WaitingForInjection(tabid, script) {
+	var time = 1;
 	var WaitingTimer = setInterval(function () {
 		chrome.tabs.get(tabid, function (tab) {
-			console.log("" + tabid + tab.status);
+			console.log("" + time++ + " " + tabid + tab.status);
 			if (tab.status == "complete") {
 				console.log(tab);
 				clearInterval(WaitingTimer);
