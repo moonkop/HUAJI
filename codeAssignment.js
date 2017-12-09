@@ -47,8 +47,8 @@ var AnswerTypeMap = {
 function doAssignments() {
 	getParams();
 	$.each(examStudentExerciseSerialList, function (index, value) {
-		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 		console.log("working on No." + (index + 1));
+		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
 	handExam();
 	setTimeout(() => {
@@ -58,31 +58,47 @@ function doAssignments() {
 
 function handExam() {
 	getParams();
-	var PostSucceed = false;
-	var failtime = 0;
-	while (PostSucceed == false && failtime < 100) {
-		$.ajax({
-			type: "POST",
-			async: false,
-			url:
-				"/student/exam/manageExam.do?method=handExam&examReplyId=" +
-				examReplyId +
-				"&examId=" +
-				examId +
-				"&taskStudentId=",
-			data: {},
-			success: function (result) {
-				console.log("handExam" + result);
-				PostSucceed = true;
-			},
-			error: function () {
-				console.log("handExamFailed");
-				failtime++;
+	tryPost({
+		type: "POST",
+		async: false,
+		url:
+			"/student/exam/manageExam.do?method=handExam&examReplyId=" +
+			examReplyId +
+			"&examId=" +
+			examId +
+			"&taskStudentId=",
+		data: {},
+		dataType: "json"
+	}, function () {
+		console.log("handExam" + result);
+	}, function () {
+		console.log("handExamFailed");
+	});
 
-			},
-			dataType: "json"
-		});
-	}
+
+	// while (PostSucceed == false && failtime < 100) {
+	// 	$.ajax({
+	// 		type: "POST",
+	// 		async: false,
+	// 		url:
+	// 			"/student/exam/manageExam.do?method=handExam&examReplyId=" +
+	// 			examReplyId +
+	// 			"&examId=" +
+	// 			examId +
+	// 			"&taskStudentId=",
+	// 		data: {},
+	// 		success: function (result) {
+	// 			console.log("handExam" + result);
+	// 			PostSucceed = true;
+	// 		},
+	// 		error: function () {
+	// 			console.log("handExamFailed");
+	// 			failtime++;
+
+	// 		},
+	// 		dataType: "json"
+	// 	});
+	// }
 }
 
 function tryCurrentAnswers() {

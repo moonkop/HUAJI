@@ -16,6 +16,10 @@ function log(str) {
 	console.log(str);
 }
 
+function log_Clear() {
+	LogArea.innerHTML = "";
+}
+
 function initLogArea() {
 	var str =
 		'<div id="mask" style="background: rgba(255,255,255,0.7);float: left;z-index: 2;position: absolute;">	<div id="log-body" style="min-width: 100px;width: auto;min-height: 0;height: auto;border: 1px solid #DDDDDD;opacity: 2;"></div>	</div>';
@@ -99,7 +103,7 @@ function postTick() {
 		var ts = mydate.getTime();
 		var newdate = new Date();
 		newdate.setTime(ts + 1000 * (videoLength + 20));
-
+		log_Clear();
 		logtoBackgroundPage(
 			"skipping finished on " +
 			mydate.getHours() +
@@ -107,14 +111,14 @@ function postTick() {
 			mydate.getMinutes() +
 			":" +
 			mydate.getSeconds() +
-			"   Completing on " +
+			"  <br> Completing on " +
 			newdate.getHours() +
 			":" +
 			newdate.getMinutes() +
 			":" +
-			newdate.getSeconds()
+			newdate.getSeconds() +
+			"<br> videoLength=" + videoLength
 		);
-
 		return;
 	}
 	if (PostFinished == 1) {
@@ -130,35 +134,19 @@ function postOneData(PostTime) {
 		success: function (result) {
 			if (result == "ok") {
 				currentPostTime += 200;
-				console.log("result ok" + PostTime);
+				log("Post " + PostTime + " OK");
 				PostFinished = 1;
 			} else {
 				console.dir(result);
 			}
 		},
 		error: function () {
-			console.log("result error " + PostTime);
+			log("Post " + PostTime + " Error");
 			PostFinished = 1;
 		}
 	});
 }
 
-function postData(x) {
-	var time = x;
-	$.ajax({
-		async: false,
-		url: urlStr,
-		type: "POST",
-		data: dataStr + time,
-		success: function (result) {
-			if (result == "ok") {
-				console.log("result ok" + time);
-			} else {
-				console.dir(result);
-			}
-		}
-	});
-}
 function deleteFlashDiv() {
 	$("#player-container_wrapper").html("");
 }
@@ -226,20 +214,20 @@ function SendAlive() {
 function goTohomeWork() {
 
 	logtoBackgroundPage("going to homework");
-	sendToBackgroud({
-		action: "WaitInject",
-		script: "codeAssignment.js"
-	});
+	// sendToBackgroud({
+	// 	action: "WaitInject",
+	// 	script: "codeAssignment.js"
+	// });
 	$("center").eq(2).children().eq(0).click();
 }
 
 
 function ReloadWaitingForInject() {
 
-	sendToBackgroud({
-		action: "WaitInject",
-		script: "codeWxxx.js"
-	});
+	// sendToBackgroud({
+	// 	action: "WaitInject",
+	// 	script: "codeWxxx.js"
+	// });
 	$(".item.current").click();
 }
 
