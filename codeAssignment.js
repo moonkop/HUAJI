@@ -69,9 +69,9 @@ function handExam() {
 			"&taskStudentId=",
 		data: {},
 		dataType: "json"
-	}, function () {
+	}, function (result) {
 		console.log("handExam" + result);
-	}, function () {
+	}, function (result) {
 		console.log("handExamFailed");
 	});
 
