@@ -1,8 +1,9 @@
 var tabid;
 var dectLoadFinishedTimer;
 var defaultLessonType = "";
-var reloadTimeOut = 10000;
-
+var settings = {
+	ReloadTimeOut: 20000
+}
 function test2() {
 	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 		var tagtab = tabs[0];
@@ -138,41 +139,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 				msg.message
 			);
 			break;
-
-		case "RequestReload":
-			log(
-				"tabId=" +
-				tabid +
-				"  " +
-				msg.UserId +
-				"  " +
-				msg.UserName +
-				"   " +
-				"tryReloading"
-			);
-			chrome.tabs.executeScript(tabid, { code: "window.location.reload();" });
-			defaultLessonType = msg.lessonType;
-
-			setTimeout(function () {
-				dectLoadFinishedTimer = setInterval(
-					function () {
-						dectLoaded(sender.tab.id, msg.lessonType)
-					}
-					,
-					1000
-				);
-			}, 10000);
-			break;
 		case "WaitInject":
 			log("tabId=" + tabid +
 				"  " +
 				msg.UserId +
 				"  " +
 				msg.UserName +
-				"   WaitingInject" + "Timeout=" + msg.timeout + "    script=" + msg.script);
-			setTimeout(() => {
-				WaitingForInjection(tabid, msg.script);
-			}, msg.timeout);
+				"   WaitingInject" + "Timeout=" + settings.ReloadTimeOut + "    script=" + msg.script);
+			WaitingForInjection(tabid, script, settings.ReloadTimeOut);
 			break;
 		case "Status":
 			UpdateStatus(msg, sender);
@@ -182,18 +156,21 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 
 var tabUrl = Array();
 
-function WaitingForInjection(tabid, script) {
-	var time = 1;
-	var WaitingTimer = setInterval(function () {
-		chrome.tabs.get(tabid, function (tab) {
-			console.log("" + time++ + " " + tabid + tab.status);
-			if (tab.status == "complete") {
-				console.log(tab);
-				clearInterval(WaitingTimer);
-				InjectScript(tab.id, script);
-			}
-		});
-	}, 1000);
+function WaitingForInjection(tabid, script, timeout) {
+	setTimeout(() => {
+		var time = 1;
+		var WaitingTimer = setInterval(function () {
+			chrome.tabs.get(tabid, function (tab) {
+				console.log("" + time++ + " " + tabid + tab.status);
+				if (tab.status == "complete") {
+					console.log(tab);
+					clearInterval(WaitingTimer);
+					InjectScript(tab.id, script);
+				}
+			});
+		}, 1000);
+	}, timeout);
+
 }
 
 function dectLoaded(tabid, lessonType) {

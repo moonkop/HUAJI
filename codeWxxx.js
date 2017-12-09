@@ -1,9 +1,4 @@
-if ("undefined" == typeof urlStr) {
-	console.log("starting");
-	autoComplete();
-} else {
-	console.log("already started");
-}
+
 var reloadTimeOut = 10000;
 var videoLength;
 var urlStr;
@@ -229,23 +224,23 @@ function SendAlive() {
 }
 
 function goTohomeWork() {
-	$("center").eq(2).children().eq(0).click();
+
 	logtoBackgroundPage("going to homework");
 	sendToBackgroud({
 		action: "WaitInject",
-		timeout: reloadTimeOut,
 		script: "codeAssignment.js"
 	});
+	$("center").eq(2).children().eq(0).click();
 }
 
 
 function ReloadWaitingForInject() {
-	$(".item.current").click();
+
 	sendToBackgroud({
 		action: "WaitInject",
-		timeout: reloadTimeOut,
 		script: "codeWxxx.js"
 	});
+	$(".item.current").click();
 }
 
 function logtoBackgroundPage(str, noforegroundlog) {
@@ -294,3 +289,12 @@ function test1() { }
 function test2() {
 	ClearAllTimers();
 }
+
+$(document).ready(function () {
+	if ("undefined" == typeof urlStr) {
+		console.log("starting");
+		autoComplete();
+	} else {
+		console.log("already started");
+	}
+});

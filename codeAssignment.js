@@ -1,11 +1,9 @@
 var examReplyId; //这三个变量每套作业中一样，不同作业中不一样
 var examId;
 var teachingTaskId;
-
+var reloadTimeOut = 5000;
 var examStudentExerciseId; //这两个变量每个题目都不一样 可在list中获取
 var exerciseId;
-var reloadTimeOut = 10000;
-
 var saveAnswerURL;
 var DXanswerMap = ["A", "B", "C", "D"];
 var PDanswerMap = ["A", "B"];
@@ -172,26 +170,39 @@ function saveDUOAnswer(AnswerOption, basicData) {
 
 function postAnswer(data) {
 	getParams();
-	var PostSucceed = false;
-	var failtime = 0;
-	while (PostSucceed == false && failtime < 100) {
-		$.ajax({
-			type: "POST",
-			async: false,
-			url: saveAnswerURL,
-			data: data,
-			success: function (result) {
-				PostSucceed = true;
-			},
-			error: function () {
-				console.log("saveAnswerFailed");
-				failtime++;
-			},
-			dataType: "json"
-		});
-	}
+	tryPost({
+		type: "POST",
+		async: false,
+		url: saveAnswerURL,
+		data: data,
+	});
 }
 
+function tryPost(postContent, onsucceed, onerror) {
+	var failtime = 0;
+	var PostSucceed = false;
+	postContent['error'] = function (result) {
+		console.log("Post failed");
+		failtime++;
+		PostSucceed = false;
+		if (onerror != undefined) {
+			onerror(result);
+		}
+	}
+	postContent['success'] = function (result) {
+		if (onsucceed != undefined) {
+			onsucceed(result);
+		}
+		PostSucceed = true;
+	}
+	while (PostSucceed == false && failtime < 100) {
+		$.ajax(postContent);
+	}
+	if (failtime > 100) {
+		throw "Server Is Unavailable";
+	}
+
+}
 
 function getCurrentAnswerInfo() {
 	getParams();
@@ -201,7 +212,7 @@ function getCurrentAnswerInfo() {
 function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 	var IsCorrect = false;
 
-	$.ajax({
+	tryPost({
 		url:
 			"/student/exam/manageExam.do?method=getExerciseInfo&examReplyId=" +
 			examReplyId +
@@ -211,17 +222,15 @@ function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 			examStudentExerciseId1, //后台处理程序
 		dataType: "json", //接受数据格式
 		async: false,
-		success: function (result) {
-			IsCorrect = result.examAnswer.correctFlag;
-		}
-	});
-
+	}, function (result) {
+		IsCorrect = result.examAnswer.correctFlag;
+	})
 	return IsCorrect;
 }
 
 function getAnswerType(exerciseId1, examStudentExerciseId1) {
 	var type;
-	$.ajax({
+	tryPost({
 		url:
 			"/student/exam/manageExam.do?method=getExerciseInfo&examReplyId=" +
 			examReplyId +
@@ -231,11 +240,9 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 			examStudentExerciseId1, //后台处理程序
 		dataType: "json", //接受数据格式
 		async: false,
-		success: function (result) {
-			type = result.type;
-		}
-	});
-
+	}, function (result) {
+		type = result.type;
+	})
 	return type;
 }
 
@@ -243,7 +250,6 @@ function GoBackToVideo() {
 	sendToBackgroud(
 		{
 			action: "WaitInject",
-			timeout: reloadTimeOut,
 			script: "codeWxxx.js"
 		}
 	);
@@ -261,14 +267,16 @@ function inject() {
 	document.body.appendChild(script);
 }
 
-window.addEventListener(
-	"message",
-	function (event) {
-		// We only accept messages from ourselves
-		if (event.source != window) return;
-		examStudentExerciseSerialList = event.data;
-		doAssignments();
-	},
-	false
-);
-inject();
+$(document).ready(function () {
+	window.addEventListener(
+		"message",
+		function (event) {
+			// We only accept messages from ourselves
+			if (event.source != window) return;
+			examStudentExerciseSerialList = event.data;
+			doAssignments();
+		},
+		false
+	);
+	inject();
+});
