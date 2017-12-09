@@ -9,7 +9,7 @@ var TimerArea;
 var LogArea;
 var countInterval;
 var homeworkTimer;
-
+var episode;
 function log(str) {
 	LogArea.innerHTML += str + "<br>";
 	console.log(str);
@@ -32,10 +32,12 @@ function getStrs() {
 	var regxData = RegExp("teachingTaskId.*=", "g");
 	var regxTime = /\d+(?=&playTime)/;
 	var regxId = /\d+(?=\s+姓名)/;
+	var regEpisode = /\d+/;
 	var regxName = /[\u4e00-\u9fa5]+(?=\s+【)/;
 	var userstr = document.getElementsByClassName("bottom")[0].innerText;
 	var Script = document.getElementsByClassName("content_bg")[0].children[2]
 		.innerText;
+	episode = regEpisode.exec($("font").html());
 	username = regxName.exec(userstr)[0];
 	userid = regxId.exec(userstr)[0];
 	urlStr = regxUrl.exec(Script)[0];
@@ -107,6 +109,7 @@ function postTick() {
 			userid +
 				" " +
 				username +
+				$("font").html() +
 				"<br>" +
 				"skipping finished on " +
 				mydate.getHours() +

@@ -32,6 +32,7 @@ var DUOanswerMap = [
 	["A", "B", "C", "E"],
 	["A", "B", "D", "E"],
 	["A", "C", "D", "E"],
+	["B", "C", "D", "E"],
 	["A", "B", "C", "D", "E"],
 	["A"],
 	["B"],
@@ -78,30 +79,6 @@ function handExam() {
 			console.log("handExamFailed");
 		}
 	);
-
-	// while (PostSucceed == false && failtime < 100) {
-	// 	$.ajax({
-	// 		type: "POST",
-	// 		async: false,
-	// 		url:
-	// 			"/student/exam/manageExam.do?method=handExam&examReplyId=" +
-	// 			examReplyId +
-	// 			"&examId=" +
-	// 			examId +
-	// 			"&taskStudentId=",
-	// 		data: {},
-	// 		success: function (result) {
-	// 			console.log("handExam" + result);
-	// 			PostSucceed = true;
-	// 		},
-	// 		error: function () {
-	// 			console.log("handExamFailed");
-	// 			failtime++;
-
-	// 		},
-	// 		dataType: "json"
-	// 	});
-	// }
 }
 
 function tryCurrentAnswers() {
@@ -179,8 +156,14 @@ var DUOPostMap = {
 	E: "DuoXanswerE"
 };
 function saveDUOAnswer(AnswerOption, basicData) {
+	basicData["duoxAnswer"] = "";
 	$.each(AnswerOption, function(index, value) {
 		basicData[DUOPostMap[value]] = true;
+		if (value == "A") {
+			basicData["duoxAnswer"] += value;
+		} else {
+			basicData["duoxAnswer"] += "," + value;
+		}
 	});
 	postAnswer(basicData);
 }
