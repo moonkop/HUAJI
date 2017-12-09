@@ -1,4 +1,3 @@
-
 var reloadTimeOut = 10000;
 var videoLength;
 var urlStr;
@@ -70,8 +69,8 @@ function init() {
 	} catch (error) {
 		logtoBackgroundPage(
 			"Critical error: DataStr or UrlStr undefined" +
-			error.message +
-			" Reloading"
+				error.message +
+				" Reloading"
 		);
 		ReloadWaitingForInject();
 	}
@@ -105,19 +104,24 @@ function postTick() {
 		newdate.setTime(ts + 1000 * (videoLength + 20));
 		log_Clear();
 		logtoBackgroundPage(
-			"skipping finished on " +
-			mydate.getHours() +
-			":" +
-			mydate.getMinutes() +
-			":" +
-			mydate.getSeconds() +
-			"  <br> Completing on " +
-			newdate.getHours() +
-			":" +
-			newdate.getMinutes() +
-			":" +
-			newdate.getSeconds() +
-			"<br> videoLength=" + videoLength
+			userid +
+				" " +
+				username +
+				"<br>" +
+				"skipping finished on " +
+				mydate.getHours() +
+				":" +
+				mydate.getMinutes() +
+				":" +
+				mydate.getSeconds() +
+				"  <br> Completing on " +
+				newdate.getHours() +
+				":" +
+				newdate.getMinutes() +
+				":" +
+				newdate.getSeconds() +
+				"<br>Length=" +
+				videoLength
 		);
 		return;
 	}
@@ -131,7 +135,7 @@ function postOneData(PostTime) {
 		url: urlStr,
 		type: "POST",
 		data: dataStr + PostTime,
-		success: function (result) {
+		success: function(result) {
 			if (result == "ok") {
 				currentPostTime += 200;
 				log("Post " + PostTime + " OK");
@@ -140,7 +144,7 @@ function postOneData(PostTime) {
 				console.dir(result);
 			}
 		},
-		error: function () {
+		error: function() {
 			log("Post " + PostTime + " Error");
 			PostFinished = 1;
 		}
@@ -172,7 +176,7 @@ function getfinish() {
 		type: "POST",
 		url: urlStr,
 		data: dataStr + videoLength, //此处改为视频时间
-		success: function (result) {
+		success: function(result) {
 			if (result == "complete") {
 				log("lessonIsCompelete");
 				console.dir(result);
@@ -212,22 +216,15 @@ function SendAlive() {
 }
 
 function goTohomeWork() {
-
 	logtoBackgroundPage("going to homework");
-	// sendToBackgroud({
-	// 	action: "WaitInject",
-	// 	script: "codeAssignment.js"
-	// });
-	$("center").eq(2).children().eq(0).click();
+	$("center")
+		.eq(2)
+		.children()
+		.eq(0)
+		.click();
 }
 
-
 function ReloadWaitingForInject() {
-
-	// sendToBackgroud({
-	// 	action: "WaitInject",
-	// 	script: "codeWxxx.js"
-	// });
 	$(".item.current").click();
 }
 
@@ -273,12 +270,12 @@ function autoComplete() {
 
 //----------------------test-functions---------------
 
-function test1() { }
+function test1() {}
 function test2() {
 	ClearAllTimers();
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
 	if ("undefined" == typeof urlStr) {
 		console.log("starting");
 		autoComplete();

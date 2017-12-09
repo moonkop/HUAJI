@@ -38,15 +38,15 @@ var DUOanswerMap = [
 	["C"],
 	["D"],
 	["E"]
-]
+];
 var AnswerTypeMap = {
 	"1": "DX",
 	"2": "PD",
 	"4": "DUO"
-}
+};
 function doAssignments() {
 	getParams();
-	$.each(examStudentExerciseSerialList, function (index, value) {
+	$.each(examStudentExerciseSerialList, function(index, value) {
 		console.log("working on No." + (index + 1));
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
@@ -58,23 +58,26 @@ function doAssignments() {
 
 function handExam() {
 	getParams();
-	tryPost({
-		type: "POST",
-		async: false,
-		url:
-			"/student/exam/manageExam.do?method=handExam&examReplyId=" +
-			examReplyId +
-			"&examId=" +
-			examId +
-			"&taskStudentId=",
-		data: {},
-		dataType: "json"
-	}, function (result) {
-		console.log("handExam" + result);
-	}, function (result) {
-		console.log("handExamFailed");
-	});
-
+	tryPost(
+		{
+			type: "POST",
+			async: false,
+			url:
+				"/student/exam/manageExam.do?method=handExam&examReplyId=" +
+				examReplyId +
+				"&examId=" +
+				examId +
+				"&taskStudentId=",
+			data: {},
+			dataType: "json"
+		},
+		function(result) {
+			console.log("handExam" + result);
+		},
+		function(result) {
+			console.log("handExamFailed");
+		}
+	);
 
 	// while (PostSucceed == false && failtime < 100) {
 	// 	$.ajax({
@@ -107,7 +110,6 @@ function tryCurrentAnswers() {
 }
 
 function tryAnswers(exerciseId1, examStudentExerciseId1) {
-
 	var answerMap;
 	var saveAnswerFun;
 
@@ -134,13 +136,13 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 			break;
 	}
 
-	$.each(answerMap, function (index, value) {
+	$.each(answerMap, function(index, value) {
 		var basicData = {
 			examReplyId: examReplyId,
 			examId: examId,
 			teachingTaskId: teachingTaskId,
 			examStudentExerciseId: examStudentExerciseId1,
-			exerciseId: exerciseId1,
+			exerciseId: exerciseId1
 		};
 		saveAnswerFun(value, basicData);
 		console.log("tryAnswers " + value);
@@ -162,27 +164,26 @@ function getParams() {
 }
 
 function saveDXAnswer(AnswerOption, basicData) {
-	basicData['DXanswer'] = AnswerOption;
+	basicData["DXanswer"] = AnswerOption;
 	postAnswer(basicData);
 }
 function savePDAnswer(AnswerOption, basicData) {
-	basicData['PDanswer'] = AnswerOption;
+	basicData["PDanswer"] = AnswerOption;
 	postAnswer(basicData);
 }
 var DUOPostMap = {
-	"A": "DuoXanswerA",
-	"B": "DuoXanswerB",
-	"C": "DuoXanswerC",
-	"D": "DuoXanswerD",
-	"E": "DuoXanswerE",
-}
+	A: "DuoXanswerA",
+	B: "DuoXanswerB",
+	C: "DuoXanswerC",
+	D: "DuoXanswerD",
+	E: "DuoXanswerE"
+};
 function saveDUOAnswer(AnswerOption, basicData) {
-	$.each(AnswerOption, function (index, value) {
+	$.each(AnswerOption, function(index, value) {
 		basicData[DUOPostMap[value]] = true;
 	});
 	postAnswer(basicData);
 }
-
 
 function postAnswer(data) {
 	getParams();
@@ -190,34 +191,33 @@ function postAnswer(data) {
 		type: "POST",
 		async: false,
 		url: saveAnswerURL,
-		data: data,
+		data: data
 	});
 }
 
 function tryPost(postContent, onsucceed, onerror) {
 	var failtime = 0;
 	var PostSucceed = false;
-	postContent['error'] = function (result) {
+	postContent["error"] = function(result) {
 		console.log("Post failed");
 		failtime++;
 		PostSucceed = false;
 		if (onerror != undefined) {
 			onerror(result);
 		}
-	}
-	postContent['success'] = function (result) {
+	};
+	postContent["success"] = function(result) {
 		if (onsucceed != undefined) {
 			onsucceed(result);
 		}
 		PostSucceed = true;
-	}
+	};
 	while (PostSucceed == false && failtime < 100) {
 		$.ajax(postContent);
 	}
 	if (failtime > 100) {
 		throw "Server Is Unavailable";
 	}
-
 }
 
 function getCurrentAnswerInfo() {
@@ -228,49 +228,54 @@ function getCurrentAnswerInfo() {
 function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 	var IsCorrect = false;
 
-	tryPost({
-		url:
-			"/student/exam/manageExam.do?method=getExerciseInfo&examReplyId=" +
-			examReplyId +
-			"&exerciseId=" +
-			exerciseId1 +
-			"&examStudentExerciseId=" +
-			examStudentExerciseId1, //后台处理程序
-		dataType: "json", //接受数据格式
-		async: false,
-	}, function (result) {
-		IsCorrect = result.examAnswer.correctFlag;
-	})
+	tryPost(
+		{
+			url:
+				"/student/exam/manageExam.do?method=getExerciseInfo&examReplyId=" +
+				examReplyId +
+				"&exerciseId=" +
+				exerciseId1 +
+				"&examStudentExerciseId=" +
+				examStudentExerciseId1, //后台处理程序
+			dataType: "json", //接受数据格式
+			async: false
+		},
+		function(result) {
+			IsCorrect = result.examAnswer.correctFlag;
+		}
+	);
 	return IsCorrect;
 }
 
 function getAnswerType(exerciseId1, examStudentExerciseId1) {
 	var type;
-	tryPost({
-		url:
-			"/student/exam/manageExam.do?method=getExerciseInfo&examReplyId=" +
-			examReplyId +
-			"&exerciseId=" +
-			exerciseId1 +
-			"&examStudentExerciseId=" +
-			examStudentExerciseId1, //后台处理程序
-		dataType: "json", //接受数据格式
-		async: false,
-	}, function (result) {
-		type = result.type;
-	})
+	tryPost(
+		{
+			url:
+				"/student/exam/manageExam.do?method=getExerciseInfo&examReplyId=" +
+				examReplyId +
+				"&exerciseId=" +
+				exerciseId1 +
+				"&examStudentExerciseId=" +
+				examStudentExerciseId1, //后台处理程序
+			dataType: "json", //接受数据格式
+			async: false
+		},
+		function(result) {
+			type = result.type;
+		}
+	);
 	return type;
 }
 
 function GoBackToVideo() {
-	sendToBackgroud(
-		{
-			action: "WaitInject",
-			script: "codeWxxx.js"
-		}
-	);
-	$(".icon.videoIcon").parent().click();
-
+	sendToBackgroud({
+		action: "WaitInject",
+		script: "codeWxxx.js"
+	});
+	$(".icon.videoIcon")
+		.parent()
+		.click();
 }
 function sendToBackgroud(data) {
 	data.lessonType = "Wxxx";
@@ -283,14 +288,20 @@ function inject() {
 	document.body.appendChild(script);
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
 	window.addEventListener(
 		"message",
-		function (event) {
+		function(event) {
 			// We only accept messages from ourselves
 			if (event.source != window) return;
 			examStudentExerciseSerialList = event.data;
-			doAssignments();
+			if (examReplyId != "") {
+				setTimeout(() => {
+					doAssignments();
+				}, 0);
+			} else {
+				console.log("already started");
+			}
 		},
 		false
 	);
