@@ -48,7 +48,8 @@ var AnswerTypeMap = {
 };
 function doAssignments() {
 	getParams();
-	$.each(examStudentExerciseSerialList, function (index, value) {
+	SendNotification("正在完成作业");
+	$.each(examStudentExerciseSerialList, function(index, value) {
 		log("working on No." + (index + 1));
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
@@ -74,10 +75,10 @@ function handExam() {
 			data: {},
 			dataType: "json"
 		},
-		function (result) {
+		function(result) {
 			log("handExam" + result);
 		},
-		function (result) {
+		function(result) {
 			log("handExamFailed");
 		}
 	);
@@ -115,12 +116,12 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 			return;
 		default:
 			log("Error Type");
-			SendNotification("作业出错 重试中");
+			SendNotification("作业出错 重试中", "pss");
 			refresh();
 			break;
 	}
 
-	$.each(answerMap, function (index, value) {
+	$.each(answerMap, function(index, value) {
 		var basicData = {
 			examReplyId: examReplyId,
 			examId: examId,
@@ -164,7 +165,7 @@ var DUOPostMap = {
 };
 function saveDUOAnswer(AnswerOption, basicData) {
 	basicData["duoxAnswer"] = "";
-	$.each(AnswerOption, function (index, value) {
+	$.each(AnswerOption, function(index, value) {
 		basicData[DUOPostMap[value]] = true;
 		if (value == "A") {
 			basicData["duoxAnswer"] += value;
@@ -188,7 +189,7 @@ function postAnswer(data) {
 function tryPost(postContent, onsucceed, onerror) {
 	var failtime = 0;
 	var PostSucceed = false;
-	postContent["error"] = function (result) {
+	postContent["error"] = function(result) {
 		log("Post failed");
 		failtime++;
 		PostSucceed = false;
@@ -196,7 +197,7 @@ function tryPost(postContent, onsucceed, onerror) {
 			onerror(result);
 		}
 	};
-	postContent["success"] = function (result) {
+	postContent["success"] = function(result) {
 		if (onsucceed != undefined) {
 			onsucceed(result);
 		}
@@ -206,6 +207,7 @@ function tryPost(postContent, onsucceed, onerror) {
 		$.ajax(postContent);
 	}
 	if (failtime > 100) {
+		SendNotification("服务器炸了作业不能做", "pss");
 		throw "Server Is Unavailable";
 	}
 }
@@ -230,7 +232,7 @@ function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function (result) {
+		function(result) {
 			IsCorrect = result.examAnswer.correctFlag;
 		}
 	);
@@ -251,7 +253,7 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function (result) {
+		function(result) {
 			if (result.examAnswer.correctFlag == true) {
 				type = 100;
 			} else {
@@ -283,13 +285,12 @@ function inject() {
 }
 function refresh() {
 	window.location.reload();
-
 }
-$(document).ready(function () {
+$(document).ready(function() {
 	log("codeAssignment.js Loaded");
 	window.addEventListener(
 		"message",
-		function (event) {
+		function(event) {
 			// We only accept messages from ourselves
 			if (event.source != window) return;
 			examStudentExerciseSerialList = event.data;

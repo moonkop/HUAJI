@@ -8,61 +8,22 @@ var TimerArea;
 var countInterval;
 var homeworkTimer;
 var episode;
-
-
+var episodeNum;
+var lessonName;
 function getStrs() {
-	logtoBackgroundPage("getting strs");
 	var regxUrl = RegExp("/student.*Time", "g");
 	var regxData = RegExp("teachingTaskId.*=", "g");
 	var regxTime = /\d+(?=&playTime)/;
-	var regxId = /\d+(?=\s+姓名)/;
 	var regEpisode = /\d+/;
-	var regxName = /[\u4e00-\u9fa5]+(?=\s+【)/;
 	var userstr = document.getElementsByClassName("bottom")[0].innerText;
 	var Script = document.getElementsByClassName("content_bg")[0].children[2]
 		.innerText;
 	episode = regEpisode.exec($("font").html());
-	username = regxName.exec(userstr)[0];
-	userid = regxId.exec(userstr)[0];
+	episodeNum = regEpisode.exec($(".nav_info").html());
+	lessonName = $(".homeIcon span").html();
 	urlStr = regxUrl.exec(Script)[0];
 	dataStr = regxData.exec(Script)[0];
 	videoLength = Number(regxTime.exec(dataStr));
-	logtoBackgroundPage("dataStr=" + dataStr);
-	logtoBackgroundPage("urlStr=" + urlStr);
-}
-
-function init() {
-	logtoBackgroundPage("getting strs");
-
-	var regxUrl = RegExp("/student.*Time", "g");
-	var regxData = RegExp("isOpen.*=", "g");
-
-	var regxTime = /\d+(?=&playTime)/;
-	var regxId = /\d+(?=\s+姓名)/;
-	var regxName = /[\u4e00 - \u9fa5] + (?= \s + 【)/;
-	var userstr = $(".welcome")
-		.children()
-		.eq(2)
-		.html();
-	var Script = $(".content_bg_1")
-		.children()
-		.eq(3)
-		.html();
-
-	try {
-		urlStr = regxUrl.exec(Script)[0];
-		dataStr = regxData.exec(Script)[0];
-	} catch (error) {
-		logtoBackgroundPage(
-			"Critical error: DataStr or UrlStr undefined" +
-			error.message +
-			" Reloading"
-		);
-		ReloadWaitingForInject();
-	}
-	videoLength = Number(regxTime.exec(dataStr));
-	logtoBackgroundPage("dataStr=" + dataStr);
-	logtoBackgroundPage("urlStr=" + urlStr);
 }
 
 var PostTimer;
@@ -83,25 +44,30 @@ function postTick() {
 		log_Clear();
 		logtoBackgroundPage(
 			userid +
-			" " +
-			username +
-			$("font").html() +
-			"<br>" +
-			"skipping finished on " +
-			mydate.getHours() +
-			":" +
-			mydate.getMinutes() +
-			":" +
-			mydate.getSeconds() +
-			"  <br> Completing on " +
-			newdate.getHours() +
-			":" +
-			newdate.getMinutes() +
-			":" +
-			newdate.getSeconds() +
-			"<br>Length=" +
-			videoLength
+				" " +
+				username +
+				"  " +
+				episode +
+				"/" +
+				episodeNum +
+				"\n<br>" +
+				lessonName +
+				"\n<br>skipping finished on " +
+				mydate.getHours() +
+				":" +
+				mydate.getMinutes() +
+				":" +
+				mydate.getSeconds() +
+				"\n<br> Completing on " +
+				newdate.getHours() +
+				":" +
+				newdate.getMinutes() +
+				":" +
+				newdate.getSeconds() +
+				"\n<br>Length=" +
+				videoLength
 		);
+
 		return;
 	}
 	if (PostFinished == 1) {
@@ -114,7 +80,7 @@ function postOneData(PostTime) {
 		url: urlStr,
 		type: "POST",
 		data: dataStr + PostTime,
-		success: function (result) {
+		success: function(result) {
 			if (result == "ok") {
 				currentPostTime += 200;
 				log("Post " + PostTime + " OK");
@@ -123,7 +89,7 @@ function postOneData(PostTime) {
 				console.dir(result);
 			}
 		},
-		error: function () {
+		error: function() {
 			log("Post " + PostTime + " Error");
 			PostFinished = 1;
 		}
@@ -142,7 +108,7 @@ function InitTimerArea() {
 function count() {
 	sec++;
 	TimerArea.innerText = sec + "" + "/" + videoLength;
-	if (sec > videoLength + 20 && sec % 10 == 0) {
+	if (sec >= videoLength + 20 && (sec - videoLength + 20) % 60 == 0) {
 		getfinish();
 	}
 }
@@ -155,7 +121,7 @@ function getfinish() {
 		type: "POST",
 		url: urlStr,
 		data: dataStr + videoLength,
-		success: function (result) {
+		success: function(result) {
 			if (result == "complete") {
 				log("lessonIsCompelete");
 
@@ -163,7 +129,7 @@ function getfinish() {
 				ReloadWaitingForInject();
 			} else {
 				log("finishing failed");
-				SendNotification("第" + episode + "集 结束失败 正在尝试刷新");
+				SendNotification("第" + episode + "集 结束失败 正在尝试刷新","pss");
 				ReloadWaitingForInject();
 			}
 		}
@@ -181,12 +147,11 @@ function dectHomework() {
 
 //---------------interactions
 
-
 function SendStatus() {
 	sendToBackgroudFromWxxxVideo({
 		action: "Status",
 		currentTime: sec,
-		episode: episode,
+		episode: episode
 	});
 }
 
@@ -220,7 +185,6 @@ function logtoBackgroundPage(str, noforegroundlog) {
 
 function homeworkTick() {
 	if (document.getElementById("assignmentInfo").innerText.length > 10) {
-
 		goTohomeWork();
 		clearInterval(homeworkTimer);
 	}
@@ -237,20 +201,20 @@ function Start() {
 	dectHomework();
 	postAll();
 	InitTimerArea();
+	SendNotification("第" + episode + "集 已开始");
 	// var aliveSenderTimer=setInterval(SendAlive,30000);
 }
 
 //----------------------test-functions---------------
 
-function test1() { }
+function test1() {}
 function test2() {
 	ClearAllTimers();
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
 	log("codeWxxx.js Loaded");
 	if ("undefined" == typeof urlStr) {
-
 		Start();
 	} else {
 		console.log("already started");
