@@ -1,14 +1,25 @@
 function detect502() {
-	return $("center")
-		.eq(0)
-		.text()
-		.startsWith("50");
+    try {
+        var res = $("center")
+            .eq(0)
+            .text()
+            .startsWith("50");
+    } catch (error) {
+        return false;
+    }
+    return res;
 }
-
-$(document).ready(function() {
-	if (detect502()) {
-		setTimeout(() => {
-			window.location.href = "";
-		}, 3000);
-	}
+var detect502Timer;
+$(document).ready(function () {
+    reloadIf502();
+    detect502Timer = setInterval(function () {
+        reloadIf502();
+    }, 10000);
 });
+function reloadIf502() {
+    if (detect502()) {
+        setTimeout(() => {
+            window.location.href = "";
+        }, 3000);
+    }
+}

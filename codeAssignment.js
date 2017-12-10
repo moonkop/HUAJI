@@ -47,7 +47,7 @@ var AnswerTypeMap = {
 };
 function doAssignments() {
 	getParams();
-	$.each(examStudentExerciseSerialList, function(index, value) {
+	$.each(examStudentExerciseSerialList, function (index, value) {
 		console.log("working on No." + (index + 1));
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
@@ -72,10 +72,10 @@ function handExam() {
 			data: {},
 			dataType: "json"
 		},
-		function(result) {
+		function (result) {
 			console.log("handExam" + result);
 		},
-		function(result) {
+		function (result) {
 			console.log("handExamFailed");
 		}
 	);
@@ -109,11 +109,12 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 
 			break;
 		default:
-			throw "Error Type";
+			console.log("Error Type");
+
 			break;
 	}
 
-	$.each(answerMap, function(index, value) {
+	$.each(answerMap, function (index, value) {
 		var basicData = {
 			examReplyId: examReplyId,
 			examId: examId,
@@ -157,7 +158,7 @@ var DUOPostMap = {
 };
 function saveDUOAnswer(AnswerOption, basicData) {
 	basicData["duoxAnswer"] = "";
-	$.each(AnswerOption, function(index, value) {
+	$.each(AnswerOption, function (index, value) {
 		basicData[DUOPostMap[value]] = true;
 		if (value == "A") {
 			basicData["duoxAnswer"] += value;
@@ -181,7 +182,7 @@ function postAnswer(data) {
 function tryPost(postContent, onsucceed, onerror) {
 	var failtime = 0;
 	var PostSucceed = false;
-	postContent["error"] = function(result) {
+	postContent["error"] = function (result) {
 		console.log("Post failed");
 		failtime++;
 		PostSucceed = false;
@@ -189,7 +190,7 @@ function tryPost(postContent, onsucceed, onerror) {
 			onerror(result);
 		}
 	};
-	postContent["success"] = function(result) {
+	postContent["success"] = function (result) {
 		if (onsucceed != undefined) {
 			onsucceed(result);
 		}
@@ -223,7 +224,7 @@ function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function(result) {
+		function (result) {
 			IsCorrect = result.examAnswer.correctFlag;
 		}
 	);
@@ -244,7 +245,7 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function(result) {
+		function (result) {
 			type = result.type;
 		}
 	);
@@ -252,7 +253,7 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 }
 
 function GoBackToVideo() {
-	sendToBackgroud({
+	111({
 		action: "WaitInject",
 		script: "codeWxxx.js"
 	});
@@ -260,7 +261,7 @@ function GoBackToVideo() {
 		.parent()
 		.click();
 }
-function sendToBackgroud(data) {
+function 111(data) {
 	data.lessonType = "Wxxx";
 	chrome.runtime.sendMessage(data);
 }
@@ -271,10 +272,10 @@ function inject() {
 	document.body.appendChild(script);
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
 	window.addEventListener(
 		"message",
-		function(event) {
+		function (event) {
 			// We only accept messages from ourselves
 			if (event.source != window) return;
 			examStudentExerciseSerialList = event.data;

@@ -115,15 +115,15 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 		"]";
 
 	switch (msg.action) {
-		case "Homework":
+		case "Notification":
 			var opt = {
 				type: "basic",
-				title: "正在完成作业",
-				message: msg.UserId + "   " + msg.UserName,
+				title: msg.UserId + "   " + msg.UserName,
+				message: msg.Notification,
 				iconUrl: "icon.png",
 				//requireInteraction: true
 			};
-			sendNotification(opt);
+			popNotification(opt);
 			break;
 
 		case "Log":
@@ -194,17 +194,8 @@ function startNewSzjy() {
 	Inject(null, "Szjy");
 }
 
-function testNoti() {
-	var opt = {
-		type: "basic",
-		title: "写作业！",
-		message: "",
-		iconUrl: "hj.png",
-		requireInteraction: true
-	};
-	chrome.notifications.create(null, opt);
-}
 
-function sendNotification(opt) {
+
+function popNotification(opt) {
 	chrome.notifications.create(null, opt);
 }

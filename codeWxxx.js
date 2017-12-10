@@ -2,29 +2,13 @@ var reloadTimeOut = 10000;
 var videoLength;
 var urlStr;
 var dataStr;
-var username;
-var userid;
 var sec;
 var TimerArea;
-var LogArea;
+
 var countInterval;
 var homeworkTimer;
 var episode;
-function log(str) {
-	LogArea.innerHTML += str + "<br>";
-	console.log(str);
-}
 
-function log_Clear() {
-	LogArea.innerHTML = "";
-}
-
-function initLogArea() {
-	var str =
-		'<div id="mask" style="background: rgba(255,255,255,0.7);float: left;z-index: 2;position: absolute;">	<div id="log-body" style="min-width: 100px;width: auto;min-height: 0;height: auto;border: 1px solid #DDDDDD;opacity: 2;"></div>	</div>';
-	$(".top").append(str);
-	LogArea = document.getElementById("log-body");
-}
 
 function getStrs() {
 	logtoBackgroundPage("getting strs");
@@ -53,8 +37,8 @@ function init() {
 	var regxUrl = RegExp("/student.*Time", "g");
 	var regxData = RegExp("isOpen.*=", "g");
 
-	var regxTime = /\d + (?=& playTime)/;
-	var regxId = /\d + (?= \s + 姓名)/;
+	var regxTime = /\d+(?=&playTime)/;
+	var regxId = /\d+(?=\s+姓名)/;
 	var regxName = /[\u4e00 - \u9fa5] + (?= \s + 【)/;
 	var userstr = $(".welcome")
 		.children()
@@ -71,19 +55,11 @@ function init() {
 	} catch (error) {
 		logtoBackgroundPage(
 			"Critical error: DataStr or UrlStr undefined" +
-				error.message +
-				" Reloading"
+			error.message +
+			" Reloading"
 		);
 		ReloadWaitingForInject();
 	}
-
-	try {
-		username = regxName.exec(userstr)[0];
-		userid = regxId.exec(userstr)[0];
-	} catch (error) {
-		logtoBackgroundPage("error userStr undefined" + error.message);
-	}
-
 	videoLength = Number(regxTime.exec(dataStr));
 	logtoBackgroundPage("dataStr=" + dataStr);
 	logtoBackgroundPage("urlStr=" + urlStr);
@@ -107,24 +83,24 @@ function postTick() {
 		log_Clear();
 		logtoBackgroundPage(
 			userid +
-				" " +
-				username +
-				$("font").html() +
-				"<br>" +
-				"skipping finished on " +
-				mydate.getHours() +
-				":" +
-				mydate.getMinutes() +
-				":" +
-				mydate.getSeconds() +
-				"  <br> Completing on " +
-				newdate.getHours() +
-				":" +
-				newdate.getMinutes() +
-				":" +
-				newdate.getSeconds() +
-				"<br>Length=" +
-				videoLength
+			" " +
+			username +
+			$("font").html() +
+			"<br>" +
+			"skipping finished on " +
+			mydate.getHours() +
+			":" +
+			mydate.getMinutes() +
+			":" +
+			mydate.getSeconds() +
+			"  <br> Completing on " +
+			newdate.getHours() +
+			":" +
+			newdate.getMinutes() +
+			":" +
+			newdate.getSeconds() +
+			"<br>Length=" +
+			videoLength
 		);
 		return;
 	}
@@ -138,7 +114,7 @@ function postOneData(PostTime) {
 		url: urlStr,
 		type: "POST",
 		data: dataStr + PostTime,
-		success: function(result) {
+		success: function (result) {
 			if (result == "ok") {
 				currentPostTime += 200;
 				log("Post " + PostTime + " OK");
@@ -147,7 +123,7 @@ function postOneData(PostTime) {
 				console.dir(result);
 			}
 		},
-		error: function() {
+		error: function () {
 			log("Post " + PostTime + " Error");
 			PostFinished = 1;
 		}
@@ -157,7 +133,7 @@ function postOneData(PostTime) {
 function deleteFlashDiv() {
 	$("#player-container_wrapper").html("");
 }
-function changeNavi() {
+function InitTimerArea() {
 	TimerArea = document.getElementById("nav");
 	TimerArea.innerHTML = "";
 	sec = 0;
@@ -178,15 +154,16 @@ function getfinish() {
 		async: false,
 		type: "POST",
 		url: urlStr,
-		data: dataStr + videoLength, //此处改为视频时间
-		success: function(result) {
+		data: dataStr + videoLength,
+		success: function (result) {
 			if (result == "complete") {
 				log("lessonIsCompelete");
-				console.dir(result);
+
+				SendNotification("第" + episode + "集 视频结束 正在前往下一集");
 				ReloadWaitingForInject();
 			} else {
 				log("finishing failed");
-				console.dir(result);
+				SendNotification("第" + episode + "集 结束失败 正在尝试刷新");
 				ReloadWaitingForInject();
 			}
 		}
@@ -212,14 +189,18 @@ function dectHomework() {
 
 //---------------interactions
 
-function SendAlive() {
-	sendToBackgroud({
-		action: "Alive"
+
+function SendStatus() {
+	sendToBackgroudFromWxxxVideo({
+		action: "Status",
+		currentTime: sec,
+		episode: episode,
 	});
 }
 
 function goTohomeWork() {
 	logtoBackgroundPage("going to homework");
+	SendNotification("正在前往作业");
 	$("center")
 		.eq(2)
 		.children()
@@ -229,6 +210,9 @@ function goTohomeWork() {
 
 function ReloadWaitingForInject() {
 	$(".item.current").click();
+	setTimeout(() => {
+		window.location.reload();
+	}, 60000);
 }
 
 function logtoBackgroundPage(str, noforegroundlog) {
@@ -236,7 +220,7 @@ function logtoBackgroundPage(str, noforegroundlog) {
 	if (!noforegroundlog) {
 		log(str);
 	}
-	sendToBackgroud({
+	sendToBackgroudFromWxxxVideo({
 		action: "Log",
 		message: str
 	});
@@ -244,19 +228,14 @@ function logtoBackgroundPage(str, noforegroundlog) {
 
 function homeworkTick() {
 	if (document.getElementById("assignmentInfo").innerText.length > 10) {
-		sendToBackgroud({
-			action: "Homework"
-		});
+
 		goTohomeWork();
 		clearInterval(homeworkTimer);
 	}
 }
 
-function sendToBackgroud(data) {
-	data.UserId = userid;
-	data.UserName = username;
-	data.lessonType = "Wxxx";
-	chrome.runtime.sendMessage(data);
+function sendToBackgroudFromWxxxVideo(data) {
+	sendToBackgroud(data, "WxxxVideo");
 }
 
 function autoComplete() {
@@ -267,18 +246,18 @@ function autoComplete() {
 	getStrs();
 	dectHomework();
 	postAll();
-	changeNavi();
+	InitTimerArea();
 	// var aliveSenderTimer=setInterval(SendAlive,30000);
 }
 
 //----------------------test-functions---------------
 
-function test1() {}
+function test1() { }
 function test2() {
 	ClearAllTimers();
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
 	if ("undefined" == typeof urlStr) {
 		console.log("starting");
 		autoComplete();
