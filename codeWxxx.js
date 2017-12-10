@@ -2,91 +2,28 @@ var reloadTimeOut = 10000;
 var videoLength;
 var urlStr;
 var dataStr;
-var username;
-var userid;
 var sec;
 var TimerArea;
-var LogArea;
+
 var countInterval;
 var homeworkTimer;
 var episode;
-function log(str) {
-	LogArea.innerHTML += str + "<br>";
-	console.log(str);
-}
-
-function log_Clear() {
-	LogArea.innerHTML = "";
-}
-
-function initLogArea() {
-	var str =
-		'<div id="mask" style="background: rgba(255,255,255,0.7);float: left;z-index: 2;position: absolute;">	<div id="log-body" style="min-width: 100px;width: auto;min-height: 0;height: auto;border: 1px solid #DDDDDD;opacity: 2;"></div>	</div>';
-	$(".top").append(str);
-	LogArea = document.getElementById("log-body");
-}
-
+var episodeNum;
+var lessonName;
 function getStrs() {
-	logtoBackgroundPage("getting strs");
 	var regxUrl = RegExp("/student.*Time", "g");
 	var regxData = RegExp("teachingTaskId.*=", "g");
 	var regxTime = /\d+(?=&playTime)/;
-	var regxId = /\d+(?=\s+姓名)/;
 	var regEpisode = /\d+/;
-	var regxName = /[\u4e00-\u9fa5]+(?=\s+【)/;
 	var userstr = document.getElementsByClassName("bottom")[0].innerText;
 	var Script = document.getElementsByClassName("content_bg")[0].children[2]
 		.innerText;
 	episode = regEpisode.exec($("font").html());
-	username = regxName.exec(userstr)[0];
-	userid = regxId.exec(userstr)[0];
+	episodeNum = regEpisode.exec($(".nav_info").html());
+	lessonName = $(".homeIcon span").html();
 	urlStr = regxUrl.exec(Script)[0];
 	dataStr = regxData.exec(Script)[0];
 	videoLength = Number(regxTime.exec(dataStr));
-	logtoBackgroundPage("dataStr=" + dataStr);
-	logtoBackgroundPage("urlStr=" + urlStr);
-}
-
-function init() {
-	logtoBackgroundPage("getting strs");
-
-	var regxUrl = RegExp("/student.*Time", "g");
-	var regxData = RegExp("isOpen.*=", "g");
-
-	var regxTime = /\d + (?=& playTime)/;
-	var regxId = /\d + (?= \s + 姓名)/;
-	var regxName = /[\u4e00 - \u9fa5] + (?= \s + 【)/;
-	var userstr = $(".welcome")
-		.children()
-		.eq(2)
-		.html();
-	var Script = $(".content_bg_1")
-		.children()
-		.eq(3)
-		.html();
-
-	try {
-		urlStr = regxUrl.exec(Script)[0];
-		dataStr = regxData.exec(Script)[0];
-	} catch (error) {
-		logtoBackgroundPage(
-			"Critical error: DataStr or UrlStr undefined" +
-				error.message +
-				" Reloading"
-		);
-		ReloadWaitingForInject();
-	}
-
-	try {
-		username = regxName.exec(userstr)[0];
-		userid = regxId.exec(userstr)[0];
-	} catch (error) {
-		logtoBackgroundPage("error userStr undefined" + error.message);
-	}
-
-	videoLength = Number(regxTime.exec(dataStr));
-	logtoBackgroundPage("dataStr=" + dataStr);
-	logtoBackgroundPage("urlStr=" + urlStr);
 }
 
 var PostTimer;
@@ -109,23 +46,28 @@ function postTick() {
 			userid +
 				" " +
 				username +
-				$("font").html() +
-				"<br>" +
-				"skipping finished on " +
+				"  " +
+				episode +
+				"/" +
+				episodeNum +
+				"\n<br>" +
+				lessonName +
+				"\n<br>skipping finished on " +
 				mydate.getHours() +
 				":" +
 				mydate.getMinutes() +
 				":" +
 				mydate.getSeconds() +
-				"  <br> Completing on " +
+				"\n<br> Completing on " +
 				newdate.getHours() +
 				":" +
 				newdate.getMinutes() +
 				":" +
 				newdate.getSeconds() +
-				"<br>Length=" +
+				"\n<br>Length=" +
 				videoLength
 		);
+
 		return;
 	}
 	if (PostFinished == 1) {
@@ -157,7 +99,7 @@ function postOneData(PostTime) {
 function deleteFlashDiv() {
 	$("#player-container_wrapper").html("");
 }
-function changeNavi() {
+function InitTimerArea() {
 	TimerArea = document.getElementById("nav");
 	TimerArea.innerHTML = "";
 	sec = 0;
@@ -166,7 +108,7 @@ function changeNavi() {
 function count() {
 	sec++;
 	TimerArea.innerText = sec + "" + "/" + videoLength;
-	if (sec > videoLength + 20 && sec % 10 == 0) {
+	if (sec >= videoLength + 20 && (sec - videoLength + 20) % 60 == 0) {
 		getfinish();
 	}
 }
@@ -178,29 +120,22 @@ function getfinish() {
 		async: false,
 		type: "POST",
 		url: urlStr,
-		data: dataStr + videoLength, //此处改为视频时间
+		data: dataStr + videoLength,
 		success: function(result) {
 			if (result == "complete") {
 				log("lessonIsCompelete");
-				console.dir(result);
+
+				SendNotification("第" + episode + "集 视频结束 正在前往下一集");
 				ReloadWaitingForInject();
 			} else {
 				log("finishing failed");
-				console.dir(result);
+				SendNotification("第" + episode + "集 结束失败 正在尝试刷新","pss");
 				ReloadWaitingForInject();
 			}
 		}
 	});
 }
-function ClearAllTimers() {
-	// clearInterval(4); //停止系统自带上传进度计时器
-	// clearInterval(1); 				//停止焦点状态检测计时器
-	// clearInterval(3); 		//停止时间记录计时器
 
-	for (var i = 0; i < 100; i++) {
-		clearInterval(i);
-	}
-}
 var homeworkIsAlerted = 0;
 function dectHomework() {
 	homeworkIsAlerted = -1;
@@ -212,14 +147,17 @@ function dectHomework() {
 
 //---------------interactions
 
-function SendAlive() {
-	sendToBackgroud({
-		action: "Alive"
+function SendStatus() {
+	sendToBackgroudFromWxxxVideo({
+		action: "Status",
+		currentTime: sec,
+		episode: episode
 	});
 }
 
 function goTohomeWork() {
 	logtoBackgroundPage("going to homework");
+	SendNotification("正在前往作业");
 	$("center")
 		.eq(2)
 		.children()
@@ -229,6 +167,9 @@ function goTohomeWork() {
 
 function ReloadWaitingForInject() {
 	$(".item.current").click();
+	setTimeout(() => {
+		window.location.reload();
+	}, 60000);
 }
 
 function logtoBackgroundPage(str, noforegroundlog) {
@@ -236,7 +177,7 @@ function logtoBackgroundPage(str, noforegroundlog) {
 	if (!noforegroundlog) {
 		log(str);
 	}
-	sendToBackgroud({
+	sendToBackgroudFromWxxxVideo({
 		action: "Log",
 		message: str
 	});
@@ -244,30 +185,23 @@ function logtoBackgroundPage(str, noforegroundlog) {
 
 function homeworkTick() {
 	if (document.getElementById("assignmentInfo").innerText.length > 10) {
-		sendToBackgroud({
-			action: "Homework"
-		});
 		goTohomeWork();
 		clearInterval(homeworkTimer);
 	}
 }
 
-function sendToBackgroud(data) {
-	data.UserId = userid;
-	data.UserName = username;
-	data.lessonType = "Wxxx";
-	chrome.runtime.sendMessage(data);
+function sendToBackgroudFromWxxxVideo(data) {
+	sendToBackgroud(data, "WxxxVideo");
 }
 
-function autoComplete() {
-	ClearAllTimers();
+function Start() {
 	deleteFlashDiv();
-	initLogArea();
-	logtoBackgroundPage("starting");
+	log("codeWxxx.js Loaded");
 	getStrs();
 	dectHomework();
 	postAll();
-	changeNavi();
+	InitTimerArea();
+	SendNotification("第" + episode + "集 已开始");
 	// var aliveSenderTimer=setInterval(SendAlive,30000);
 }
 
@@ -279,9 +213,9 @@ function test2() {
 }
 
 $(document).ready(function() {
+	log("codeWxxx.js Loaded");
 	if ("undefined" == typeof urlStr) {
-		console.log("starting");
-		autoComplete();
+		Start();
 	} else {
 		console.log("already started");
 	}

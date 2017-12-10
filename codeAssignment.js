@@ -43,14 +43,17 @@ var DUOanswerMap = [
 var AnswerTypeMap = {
 	"1": "DX",
 	"2": "PD",
-	"4": "DUO"
+	"4": "DUO",
+	"100": "SKIP"
 };
 function doAssignments() {
 	getParams();
+	SendNotification("正在完成作业");
 	$.each(examStudentExerciseSerialList, function(index, value) {
-		console.log("working on No." + (index + 1));
+		log("working on No." + (index + 1));
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
+	SendNotification("作业已完成");
 	handExam();
 	setTimeout(() => {
 		GoBackToVideo();
@@ -73,10 +76,10 @@ function handExam() {
 			dataType: "json"
 		},
 		function(result) {
-			console.log("handExam" + result);
+			log("handExam" + result);
 		},
 		function(result) {
-			console.log("handExamFailed");
+			log("handExamFailed");
 		}
 	);
 }
@@ -94,22 +97,27 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 		case "DX":
 			answerMap = DXanswerMap;
 			saveAnswerFun = saveDXAnswer;
-			console.log("DAN XUAN");
+			log("DAN XUAN");
 			break;
 		case "PD":
 			answerMap = PDanswerMap;
 			saveAnswerFun = savePDAnswer;
-			console.log("PAN DUAN");
+			log("PAN DUAN");
 
 			break;
 		case "DUO":
 			answerMap = DUOanswerMap;
 			saveAnswerFun = saveDUOAnswer;
-			console.log("DUO XUAN");
-
+			log("DUO XUAN");
 			break;
+		case "SKIP":
+			log("---------  Already correct skipping  ---------------------");
+
+			return;
 		default:
-			throw "Error Type";
+			log("Error Type");
+			SendNotification("作业出错 重试中", "pss");
+			refresh();
 			break;
 	}
 
@@ -122,10 +130,10 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 			exerciseId: exerciseId1
 		};
 		saveAnswerFun(value, basicData);
-		console.log("tryAnswers " + value);
+		log("tryAnswers " + value);
 		var IsCorrect = getAnswerInfo(exerciseId1, examStudentExerciseId1);
 		if (IsCorrect == true) {
-			console.log("---------  Answer is " + value + "---------------------");
+			log("---------  Answer is " + value + "---------------------");
 			return false;
 		}
 	});
@@ -182,7 +190,7 @@ function tryPost(postContent, onsucceed, onerror) {
 	var failtime = 0;
 	var PostSucceed = false;
 	postContent["error"] = function(result) {
-		console.log("Post failed");
+		log("Post failed");
 		failtime++;
 		PostSucceed = false;
 		if (onerror != undefined) {
@@ -199,6 +207,7 @@ function tryPost(postContent, onsucceed, onerror) {
 		$.ajax(postContent);
 	}
 	if (failtime > 100) {
+		SendNotification("服务器炸了作业不能做", "pss");
 		throw "Server Is Unavailable";
 	}
 }
@@ -245,7 +254,11 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 			async: false
 		},
 		function(result) {
-			type = result.type;
+			if (result.examAnswer.correctFlag == true) {
+				type = 100;
+			} else {
+				type = result.type;
+			}
 		}
 	);
 	return type;
@@ -261,7 +274,7 @@ function GoBackToVideo() {
 		.click();
 }
 function sendToBackgroud(data) {
-	data.lessonType = "Wxxx";
+	data.pageName = "Assignment";
 	chrome.runtime.sendMessage(data);
 }
 
@@ -270,8 +283,11 @@ function inject() {
 	script.innerHTML = 'window.postMessage(examStudentExerciseSerialList, "*");';
 	document.body.appendChild(script);
 }
-
+function refresh() {
+	window.location.reload();
+}
 $(document).ready(function() {
+	log("codeAssignment.js Loaded");
 	window.addEventListener(
 		"message",
 		function(event) {
@@ -279,14 +295,17 @@ $(document).ready(function() {
 			if (event.source != window) return;
 			examStudentExerciseSerialList = event.data;
 			if (examReplyId != "") {
-				setTimeout(() => {
-					doAssignments();
-				}, 0);
+				Start();
 			} else {
-				console.log("already started");
+				log("already started");
 			}
 		},
 		false
 	);
 	inject();
 });
+function Start() {
+	setTimeout(() => {
+		doAssignments();
+	}, 3000);
+}

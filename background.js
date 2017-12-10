@@ -1,11 +1,17 @@
 var tabid;
 var dectLoadFinishedTimer;
+
+var iconMap = {
+	hj: "icon.png",
+	pss: "pss.png"
+};
+
 var defaultLessonType = "";
 var settings = {
 	ReloadTimeOut: 20000
-}
+};
 function test2() {
-	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+	chrome.tabs.query({ currentWindow: true, active: true }, function(tabs) {
 		var tagtab = tabs[0];
 		//	RecordTabStatus(tagtab.id);
 		WaitingForInjection(tagtab.id, "codeWxxx.js");
@@ -17,22 +23,21 @@ function doAssignments() {
 
 var RecordTabStatusTimer;
 function RecordTabStatus(tabid) {
-	RecordTabStatusTimer = setInterval(function () {
+	RecordTabStatusTimer = setInterval(function() {
 		getTabStatus(tabid);
 	}, 100);
 }
 
 function getTabStatus(tabid) {
-	chrome.tabs.get(tabid, function (tab) {
+	chrome.tabs.get(tabid, function(tab) {
 		console.log(tab.status);
-	})
+	});
 }
 
 function InjectScript(id, script) {
 	chrome.tabs.executeScript(id, { file: "jquery-1.3.2.min.js" });
 	chrome.tabs.executeScript(id, { file: script });
 }
-
 
 function Inject(id, lessonType) {
 	chrome.tabs.executeScript(id, { file: "jquery-1.3.2.min.js" });
@@ -50,7 +55,7 @@ function ReloadCurrentTab() {
 	// chrome.tabs.getCurrent(function (tab) {
 	//     ReloadTab(tab);
 	// });
-	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+	chrome.tabs.query({ currentWindow: true, active: true }, function(tabs) {
 		var tagtab = tabs[0];
 		console.log(tagtab);
 		ReloadTab(tagtab);
@@ -65,24 +70,16 @@ function ReloadTab(tagTab) {
 	}
 
 	if (tagTab == null) {
-		setTimeout(function () {
-			dectLoadFinishedTimer = setInterval(
-				function () {
-					dectLoaded(null, defaultLessonType)
-				}
-				,
-				1000
-			);
+		setTimeout(function() {
+			dectLoadFinishedTimer = setInterval(function() {
+				dectLoaded(null, defaultLessonType);
+			}, 1000);
 		}, 10000);
 	} else {
-		setTimeout(function () {
-			dectLoadFinishedTimer = setInterval(
-				function () {
-					dectLoaded(tagTab.id, defaultLessonType)
-				}
-				,
-				1000
-			);
+		setTimeout(function() {
+			dectLoadFinishedTimer = setInterval(function() {
+				dectLoaded(tagTab.id, defaultLessonType);
+			}, 1000);
 		}, 10000);
 	}
 }
@@ -100,9 +97,9 @@ function getFinish() {
 function log(str) {
 	console.log(str);
 }
-function UpdateStatus(msg, tab) { }
+function UpdateStatus(msg, tab) {}
 
-chrome.runtime.onMessage.addListener(function (msg, sender) {
+chrome.runtime.onMessage.addListener(function(msg, sender) {
 	tabid = sender.tab.id;
 	var time = new Date();
 	var timestr =
@@ -115,37 +112,43 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 		"]";
 
 	switch (msg.action) {
-		case "Homework":
-			var opt = {
+		case "Notification":
+			popNotification({
 				type: "basic",
-				title: "正在完成作业",
-				message: msg.UserId + "   " + msg.UserName,
-				iconUrl: "icon.png",
+				title: msg.UserId + "   " + msg.UserName,
+				message: msg.Notification,
+				iconUrl: iconMap[msg.icon]
 				//requireInteraction: true
-			};
-			sendNotification(opt);
+			});
 			break;
 
 		case "Log":
 			log(
 				"tabId=" +
-				tabid +
-				timestr +
-				"  " +
-				msg.UserId +
-				"  " +
-				msg.UserName +
-				"   " +
-				msg.message
+					tabid +
+					timestr +
+					"  " +
+					msg.UserId +
+					"  " +
+					msg.UserName +
+					"   " +
+					msg.message
 			);
 			break;
 		case "WaitInject":
-			log("tabId=" + tabid +
-				"  " +
-				msg.UserId +
-				"  " +
-				msg.UserName +
-				"   WaitingInject" + "Timeout=" + settings.ReloadTimeOut + "    script=" + msg.script);
+			log(
+				"tabId=" +
+					tabid +
+					"  " +
+					msg.UserId +
+					"  " +
+					msg.UserName +
+					"   WaitingInject" +
+					"Timeout=" +
+					settings.ReloadTimeOut +
+					"    script=" +
+					msg.script
+			);
 			WaitingForInjection(tabid, script, settings.ReloadTimeOut);
 			break;
 		case "Status":
@@ -159,8 +162,8 @@ var tabUrl = Array();
 function WaitingForInjection(tabid, script, timeout) {
 	setTimeout(() => {
 		var time = 1;
-		var WaitingTimer = setInterval(function () {
-			chrome.tabs.get(tabid, function (tab) {
+		var WaitingTimer = setInterval(function() {
+			chrome.tabs.get(tabid, function(tab) {
 				console.log("" + time++ + " " + tabid + tab.status);
 				if (tab.status == "complete") {
 					console.log(tab);
@@ -170,11 +173,10 @@ function WaitingForInjection(tabid, script, timeout) {
 			});
 		}, 1000);
 	}, timeout);
-
 }
 
 function dectLoaded(tabid, lessonType) {
-	chrome.tabs.get(tabid, function (tab) {
+	chrome.tabs.get(tabid, function(tab) {
 		console.log(tab.status);
 		if (tab.status == "complete") {
 			console.log(tab);
@@ -194,17 +196,6 @@ function startNewSzjy() {
 	Inject(null, "Szjy");
 }
 
-function testNoti() {
-	var opt = {
-		type: "basic",
-		title: "写作业！",
-		message: "",
-		iconUrl: "hj.png",
-		requireInteraction: true
-	};
-	chrome.notifications.create(null, opt);
-}
-
-function sendNotification(opt) {
+function popNotification(opt) {
 	chrome.notifications.create(null, opt);
 }
