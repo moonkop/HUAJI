@@ -7,11 +7,13 @@ function getUserInfo() {
         var userstr = document.getElementsByClassName("bottom")[0].innerText;
         username = regxName.exec(userstr)[0];
         userid = regxId.exec(userstr)[0];
-        log("当前用户：" + username + "   当前学号" + userid);
+        log("User:" + username + "   Id:" + userid);
     } catch (error) {
         log("cant get user name and id");
     }
 }
+var myTimerArray = [];
+
 
 function ClearAllTimers() {
     // clearInterval(4); //停止系统自带上传进度计时器
@@ -19,6 +21,7 @@ function ClearAllTimers() {
     // clearInterval(3); 		//停止时间记录计时器
 
     for (var i = 0; i < 100; i++) {
+
         clearInterval(i);
     }
 }
@@ -61,8 +64,8 @@ function initLogArea() {
 }
 
 $(document).ready(function () {
-    initLogArea();
-    log("common.js 加载完毕");
+
     getUserInfo();
-    ClearAllTimers();
 });
+initLogArea();
+log("common.js Loaded");

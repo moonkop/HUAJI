@@ -169,15 +169,7 @@ function getfinish() {
 		}
 	});
 }
-function ClearAllTimers() {
-	// clearInterval(4); //停止系统自带上传进度计时器
-	// clearInterval(1); 				//停止焦点状态检测计时器
-	// clearInterval(3); 		//停止时间记录计时器
 
-	for (var i = 0; i < 100; i++) {
-		clearInterval(i);
-	}
-}
 var homeworkIsAlerted = 0;
 function dectHomework() {
 	homeworkIsAlerted = -1;
@@ -238,11 +230,9 @@ function sendToBackgroudFromWxxxVideo(data) {
 	sendToBackgroud(data, "WxxxVideo");
 }
 
-function autoComplete() {
-	ClearAllTimers();
+function Start() {
 	deleteFlashDiv();
-	initLogArea();
-	logtoBackgroundPage("starting");
+	log("codeWxxx.js Loaded");
 	getStrs();
 	dectHomework();
 	postAll();
@@ -258,9 +248,10 @@ function test2() {
 }
 
 $(document).ready(function () {
+	log("codeWxxx.js Loaded");
 	if ("undefined" == typeof urlStr) {
-		console.log("starting");
-		autoComplete();
+
+		Start();
 	} else {
 		console.log("already started");
 	}
