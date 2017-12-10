@@ -53,10 +53,10 @@ function doAssignments() {
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
 	SendNotification("作业已完成");
-	// handExam();
-	// setTimeout(() => {
-	// 	GoBackToVideo();
-	// }, reloadTimeOut);
+	handExam();
+	setTimeout(() => {
+		GoBackToVideo();
+	}, reloadTimeOut);
 }
 
 function handExam() {
