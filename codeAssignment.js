@@ -54,10 +54,10 @@ function doAssignments() {
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
 	SendNotification("作业已完成");
-	// handExam();
-	// setTimeout(() => {
-	// 	GoBack();
-	// }, reloadTimeOut);
+	handExam();
+	setTimeout(() => {
+		GoBack();
+	}, reloadTimeOut);
 }
 
 function handExam() {
@@ -264,7 +264,6 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 	return type;
 }
 
-<<<<<<< HEAD
 function GoBack() {
 	sendToBackgroud({
 		action: "WaitInject",
@@ -277,18 +276,8 @@ function GoBack() {
 			.parent()
 			.click();
 	} else {
-		window.history.back();
+		window.location.href = document.referrer;
 	}
-=======
-function GoBackToVideo() {
-	// sendToBackgroud({
-	// 	action: "WaitInject",
-	// 	script: "codeWxxx.js"
-	// });
-	$(".icon.videoIcon")
-		.parent()
-		.click();
->>>>>>> bc3a47ac5d3f29c887c01ad49d7833ebad26d854
 }
 function sendToBackgroud(data) {
 	data.pageName = "Assignment";
@@ -303,6 +292,12 @@ function inject() {
 function refresh() {
 	window.location.reload();
 }
+function Start() {
+	setTimeout(() => {
+		doAssignments();
+	}, 3000);
+}
+
 $(document).ready(function () {
 	log("codeAssignment.js Loaded");
 	window.addEventListener(
@@ -321,8 +316,3 @@ $(document).ready(function () {
 	);
 	inject();
 });
-function Start() {
-	setTimeout(() => {
-		doAssignments();
-	}, 3000);
-}

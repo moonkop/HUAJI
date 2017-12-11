@@ -1,6 +1,6 @@
 ﻿{
 	"name": "学习软件",
-	"version": "4.5.0",
+	"version": "4.9.0",
 	"description": "一个会自动学习视频的软件.",
 	"permissions": [
 		"tabs",

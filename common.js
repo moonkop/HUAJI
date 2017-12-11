@@ -1,5 +1,12 @@
 var username;
 var userid;
+function GetQueryString(name) {
+	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+	var r = window.location.search.substr(1).match(reg);
+	if (r != null)
+		return unescape(r[2]);
+	return null;
+}
 function getUserInfo() {
 	var regxName = /[\u4e00-\u9fa5]+(?=\s+【)/;
 	var regxId = /\d+(?=\s+姓名)/;
@@ -7,10 +14,13 @@ function getUserInfo() {
 		var userstr = document.getElementsByClassName("bottom")[0].innerText;
 		username = regxName.exec(userstr)[0];
 		userid = regxId.exec(userstr)[0];
-		log("User:" + username + "   Id:" + userid);
+		log(username + "  " + userid);
 	} catch (error) {
 		log("cant get user name and id");
 	}
+}
+function goToCourseHomePage() {
+	window.location.href = "student/teachingTask/coursehomepage.do?courseId=" + GetQueryString(courseId);
 }
 var myTimerArray = [];
 

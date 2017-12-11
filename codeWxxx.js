@@ -131,7 +131,7 @@ function getfinish() {
 				SendNotification("第" + episode + "集 视频结束 正在前往下一集");
 				ReloadWaitingForInject();
 			} else {
-				log("finishing failed");
+				log("finishing failed " + result);
 				SendNotification("第" + episode + "集 结束失败 正在尝试刷新", "pss");
 				ReloadWaitingForInject();
 			}
@@ -236,7 +236,7 @@ function detectOverWatch() {
 
 }
 function SubjectOver() {
-	SendNotification("已完成  " + lessonName + "  课程学习", "hj", true);
+	SendNotification("已完成  " + lessonName + "  所有视频");
 	goTohomeWorkList();
 }
 function goTohomeWorkList() {

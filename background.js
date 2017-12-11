@@ -3,7 +3,8 @@ var dectLoadFinishedTimer;
 
 var iconMap = {
 	hj: "icon.png",
-	pss: "pss.png"
+	pss: "pss.png",
+	xk: "xk.png"
 };
 
 var defaultLessonType = "";
