@@ -1,3 +1,4 @@
+var is502 = false;
 function detect502() {
     var res;
     try {
@@ -13,6 +14,7 @@ function detect502() {
 var detect502Timer;
 $(document).ready(function () {
     ClearAllTimers();
+    log("code502.js Loaded");
     reloadIf502();
     detect502Timer = setInterval(function () {
         reloadIf502();
@@ -20,7 +22,8 @@ $(document).ready(function () {
     //myTimerArray.push(detect502Timer);
 });
 function reloadIf502() {
-    if (detect502()) {
+    is502 = detect502();
+    if (is502 == true) {
         setTimeout(() => {
             window.location.href = "";
         }, 3000);
