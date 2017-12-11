@@ -26,12 +26,13 @@ function sendToBackgroud(data, pageName) {
 	}
 }
 
-function SendNotification(note, icon = "hj") {
+function SendNotification(note, icon = "hj", requireInteraction = false) {
 	sendToBackgroud(
 		{
 			action: "Notification",
 			icon: icon,
-			Notification: note
+			Notification: note,
+			requireInteraction: requireInteraction
 		},
 		"note"
 	);
@@ -54,7 +55,7 @@ function initLogArea() {
 	LogArea = document.getElementById("log-body");
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
 	getUserInfo();
 });
 initLogArea();

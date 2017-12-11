@@ -49,15 +49,15 @@ var AnswerTypeMap = {
 function doAssignments() {
 	getParams();
 	SendNotification("正在完成作业");
-	$.each(examStudentExerciseSerialList, function(index, value) {
+	$.each(examStudentExerciseSerialList, function (index, value) {
 		log("working on No." + (index + 1));
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
 	SendNotification("作业已完成");
-	handExam();
-	setTimeout(() => {
-		GoBackToVideo();
-	}, reloadTimeOut);
+	// handExam();
+	// setTimeout(() => {
+	// 	GoBack();
+	// }, reloadTimeOut);
 }
 
 function handExam() {
@@ -75,10 +75,10 @@ function handExam() {
 			data: {},
 			dataType: "json"
 		},
-		function(result) {
+		function (result) {
 			log("handExam" + result);
 		},
-		function(result) {
+		function (result) {
 			log("handExamFailed");
 		}
 	);
@@ -121,7 +121,7 @@ function tryAnswers(exerciseId1, examStudentExerciseId1) {
 			break;
 	}
 
-	$.each(answerMap, function(index, value) {
+	$.each(answerMap, function (index, value) {
 		var basicData = {
 			examReplyId: examReplyId,
 			examId: examId,
@@ -165,7 +165,7 @@ var DUOPostMap = {
 };
 function saveDUOAnswer(AnswerOption, basicData) {
 	basicData["duoxAnswer"] = "";
-	$.each(AnswerOption, function(index, value) {
+	$.each(AnswerOption, function (index, value) {
 		basicData[DUOPostMap[value]] = true;
 		if (value == "A") {
 			basicData["duoxAnswer"] += value;
@@ -189,7 +189,7 @@ function postAnswer(data) {
 function tryPost(postContent, onsucceed, onerror) {
 	var failtime = 0;
 	var PostSucceed = false;
-	postContent["error"] = function(result) {
+	postContent["error"] = function (result) {
 		log("Post failed");
 		failtime++;
 		PostSucceed = false;
@@ -197,7 +197,7 @@ function tryPost(postContent, onsucceed, onerror) {
 			onerror(result);
 		}
 	};
-	postContent["success"] = function(result) {
+	postContent["success"] = function (result) {
 		if (onsucceed != undefined) {
 			onsucceed(result);
 		}
@@ -232,7 +232,7 @@ function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function(result) {
+		function (result) {
 			IsCorrect = result.examAnswer.correctFlag;
 		}
 	);
@@ -253,7 +253,7 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function(result) {
+		function (result) {
 			if (result.examAnswer.correctFlag == true) {
 				type = 100;
 			} else {
@@ -264,14 +264,20 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 	return type;
 }
 
-function GoBackToVideo() {
+function GoBack() {
 	sendToBackgroud({
 		action: "WaitInject",
 		script: "codeWxxx.js"
 	});
-	$(".icon.videoIcon")
-		.parent()
-		.click();
+
+	var str = document.referrer;
+	if (str.indexOf("manageVideo") != -1) {
+		$(".icon.videoIcon")
+			.parent()
+			.click();
+	} else {
+		window.history.back();
+	}
 }
 function sendToBackgroud(data) {
 	data.pageName = "Assignment";
@@ -286,11 +292,11 @@ function inject() {
 function refresh() {
 	window.location.reload();
 }
-$(document).ready(function() {
+$(document).ready(function () {
 	log("codeAssignment.js Loaded");
 	window.addEventListener(
 		"message",
-		function(event) {
+		function (event) {
 			// We only accept messages from ourselves
 			if (event.source != window) return;
 			examStudentExerciseSerialList = event.data;

@@ -44,30 +44,30 @@ function postTick() {
 		log_Clear();
 		logtoBackgroundPage(
 			userid +
-				" " +
-				username +
-				"  " +
-				episode +
-				"/" +
-				episodeNum +
-				"\n<br>" +
-				lessonName +
-				"\n<br>skipping finished on " +
-				mydate.getHours() +
-				":" +
-				mydate.getMinutes() +
-				":" +
-				mydate.getSeconds() +
-				"\n<br> Completing on " +
-				newdate.getHours() +
-				":" +
-				newdate.getMinutes() +
-				":" +
-				newdate.getSeconds() +
-				"\n<br>Length=" +
-				videoLength
+			" " +
+			username +
+			"  " +
+			episode +
+			"/" +
+			episodeNum +
+			"\n<br>" +
+			lessonName +
+			"\n<br>skipping finished on " +
+			mydate.getHours() +
+			":" +
+			mydate.getMinutes() +
+			":" +
+			mydate.getSeconds() +
+			"\n<br> Completing on " +
+			newdate.getHours() +
+			":" +
+			newdate.getMinutes() +
+			":" +
+			newdate.getSeconds() +
+			"\n<br>Length=" +
+			videoLength
 		);
-
+		sec -= FirstPostTime;
 		return;
 	}
 	if (PostFinished == 1) {
@@ -75,21 +75,25 @@ function postTick() {
 		postOneData(currentPostTime);
 	}
 }
+var FirstPostTime = 0;
 function postOneData(PostTime) {
 	$.ajax({
 		url: urlStr,
 		type: "POST",
 		data: dataStr + PostTime,
-		success: function(result) {
+		success: function (result) {
 			if (result == "ok") {
 				currentPostTime += 200;
 				log("Post " + PostTime + " OK");
 				PostFinished = 1;
+				if (FirstPostTime == 0) {
+					FirstPostTime = sec;
+				}
 			} else {
 				console.dir(result);
 			}
 		},
-		error: function() {
+		error: function () {
 			log("Post " + PostTime + " Error");
 			PostFinished = 1;
 		}
@@ -121,15 +125,14 @@ function getfinish() {
 		type: "POST",
 		url: urlStr,
 		data: dataStr + videoLength,
-		success: function(result) {
+		success: function (result) {
 			if (result == "complete") {
 				log("lessonIsCompelete");
-
 				SendNotification("第" + episode + "集 视频结束 正在前往下一集");
 				ReloadWaitingForInject();
 			} else {
 				log("finishing failed");
-				SendNotification("第" + episode + "集 结束失败 正在尝试刷新","pss");
+				SendNotification("第" + episode + "集 结束失败 正在尝试刷新", "pss");
 				ReloadWaitingForInject();
 			}
 		}
@@ -163,6 +166,7 @@ function goTohomeWork() {
 		.children()
 		.eq(0)
 		.click();
+	clearInterval(PostTimer);
 }
 
 function ReloadWaitingForInject() {
@@ -201,18 +205,19 @@ function Start() {
 	dectHomework();
 	postAll();
 	InitTimerArea();
+	detectOverWatch();
 	SendNotification("第" + episode + "集 已开始");
 	// var aliveSenderTimer=setInterval(SendAlive,30000);
 }
 
 //----------------------test-functions---------------
 
-function test1() {}
+function test1() { }
 function test2() {
 	ClearAllTimers();
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
 	log("codeWxxx.js Loaded");
 	if ("undefined" == typeof urlStr) {
 		Start();
@@ -220,3 +225,21 @@ $(document).ready(function() {
 		console.log("already started");
 	}
 });
+function detectOverWatch() {
+	try {
+		if (episode == 1 && $("param[name=flashvars]").attr("value").split("&")[8].split("=")[1] == "true") {
+			SubjectOver();
+		}
+	} catch (error) {
+
+	}
+
+}
+function SubjectOver() {
+	SendNotification("已完成  " + lessonName + "  课程学习", "hj", true);
+	goTohomeWorkList();
+}
+function goTohomeWorkList() {
+	clearInterval(PostTimer);
+	$(".assignmentIcon").parent().click();
+}
