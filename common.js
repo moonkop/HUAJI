@@ -96,5 +96,13 @@ $(document).ready(function ()
 {
 	getUserInfo();
 });
+function disableAlert()
+{
+	var script = document.createElement("script");
+	script.innerHTML = '<script> alert=comfirm=function(){}</script>';
+	document.body.appendChild(script);
+}
+
 initLogArea();
+disableAlert();
 log("common.js Loaded");
