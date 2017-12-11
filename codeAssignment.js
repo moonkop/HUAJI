@@ -265,10 +265,10 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 }
 
 function GoBackToVideo() {
-	sendToBackgroud({
-		action: "WaitInject",
-		script: "codeWxxx.js"
-	});
+	// sendToBackgroud({
+	// 	action: "WaitInject",
+	// 	script: "codeWxxx.js"
+	// });
 	$(".icon.videoIcon")
 		.parent()
 		.click();
