@@ -36,12 +36,12 @@ function getTabStatus(tabid) {
 }
 
 function InjectScript(id, script) {
-	chrome.tabs.executeScript(id, { file: "jquery-1.3.2.min.js" });
+
 	chrome.tabs.executeScript(id, { file: script });
 }
 
 function Inject(id, lessonType) {
-	chrome.tabs.executeScript(id, { file: "jquery-1.3.2.min.js" });
+
 	switch (lessonType) {
 		case "Wxxx":
 			chrome.tabs.executeScript(id, { file: "codeWxxx.js" });
