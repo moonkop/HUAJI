@@ -264,6 +264,7 @@ function getAnswerType(exerciseId1, examStudentExerciseId1) {
 	return type;
 }
 
+<<<<<<< HEAD
 function GoBack() {
 	sendToBackgroud({
 		action: "WaitInject",
@@ -278,6 +279,16 @@ function GoBack() {
 	} else {
 		window.history.back();
 	}
+=======
+function GoBackToVideo() {
+	// sendToBackgroud({
+	// 	action: "WaitInject",
+	// 	script: "codeWxxx.js"
+	// });
+	$(".icon.videoIcon")
+		.parent()
+		.click();
+>>>>>>> bc3a47ac5d3f29c887c01ad49d7833ebad26d854
 }
 function sendToBackgroud(data) {
 	data.pageName = "Assignment";
