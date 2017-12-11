@@ -148,11 +148,15 @@ function getfinish()
 				log("lessonIsCompelete");
 				SendNotification("第" + episode + "集 视频结束 正在前往下一集");
 				ReloadWaitingForInject();
-			} else
+			} else if (result == "invalid")
 			{
 				log("finishing failed " + result);
 				SendNotification("第" + episode + "集 结束失败 正在尝试刷新", "pss");
 				ReloadWaitingForInject();
+			} else if (result == "ok")
+			{
+				log("already Watch" + result);
+				SendNotification("第" + episode + "集 已经看过了 正在尝试刷新", "pss");
 			}
 		}
 	});
