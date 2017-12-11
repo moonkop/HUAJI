@@ -57,6 +57,15 @@
 		},
 		{
 			"matches": [
+				"http://wxxx.hytc.edu.cn/student/assignment/index.do*"
+			],
+			"js": [
+				"codeAssignmentList.js"
+			],
+			"run_at": "document_end"
+		},
+		{
+			"matches": [
 				"http://wxxx.hytc.edu.cn/student/assignment/manageAssignment.do*"
 			],
 			"js": [

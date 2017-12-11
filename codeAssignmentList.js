@@ -1,12 +1,8 @@
 
 
 $(document).ready(
-
-
-
     function () {
-        log("codeAssignmentList.js 已加载");
-
+        log("codeAssignmentList.js Loaded");
         var allover = true;
         var obj = $(".linkBtn");
         $(obj).each(function () {
