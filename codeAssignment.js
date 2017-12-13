@@ -49,7 +49,6 @@ var AnswerTypeMap = {
 function doAssignments()
 {
 	getParams();
-	SendNotification("正在完成作业");
 	$.each(examStudentExerciseSerialList, function (index, value)
 	{
 		log("working on No." + (index + 1));
@@ -61,7 +60,7 @@ function doAssignments()
 		handExam();
 	} else
 	{
-		SendNotification("作业中没有题目");
+		SendNotification("作业中没有题目", "error");
 	}
 
 	setTimeout(() =>
@@ -132,7 +131,7 @@ function tryAnswers(exerciseId1, examStudentExerciseId1)
 			return;
 		default:
 			log("Error Type");
-			SendNotification("作业出错 重试中", "pss");
+			SendNotification("作业出错 重试中", "warning");
 			refresh();
 			break;
 	}
@@ -240,7 +239,7 @@ function tryPost(postContent, onsucceed, onerror)
 	}
 	if (failtime > 100)
 	{
-		SendNotification("服务器炸了作业不能做", "pss");
+		SendNotification("服务器炸了作业不能做", "warning");
 		throw "Server Is Unavailable";
 	}
 }
@@ -312,7 +311,7 @@ function GoBack()
 	});
 
 	var str = document.referrer;
-	if (str.indexOf("manageVideo") != -1)
+	if (str.indexOf("manageAssignment") != -1 || str.indexOf("manageVideo") != -1)
 	{
 		$(".icon.videoIcon")
 			.parent()

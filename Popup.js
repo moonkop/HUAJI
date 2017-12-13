@@ -25,6 +25,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	divs.addEventListener("click", bg.doAssignments);
 });
 document.addEventListener("DOMContentLoaded", function() {
+	var divs = document.getElementById("clearNotifications");
+	divs.addEventListener("click", bg.clearAllNoti);
+});
+document.addEventListener("DOMContentLoaded", function() {
 	var divs = document.getElementById("test2");
 	divs.addEventListener("click", bg.test2);
 });

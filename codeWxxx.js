@@ -10,8 +10,7 @@ var homeworkTimer;
 var episode;
 var episodeNum;
 var lessonName;
-function getStrs()
-{
+function getStrs() {
 	var regxUrl = RegExp("/student.*Time", "g");
 	var regxData = RegExp("teachingTaskId.*=", "g");
 	var regxTime = /\d+(?=&playTime)/;
@@ -28,18 +27,15 @@ function getStrs()
 }
 
 var PostTimer;
-function postAll()
-{
+function postAll() {
 	log("skipping to end");
 
 	PostTimer = setInterval(postTick, 200);
 }
 var currentPostTime = 0;
 var PostFinished = 1;
-function postTick()
-{
-	if (currentPostTime > videoLength)
-	{
+function postTick() {
+	if (currentPostTime > videoLength) {
 		clearInterval(PostTimer);
 		var mydate = new Date();
 		var ts = mydate.getTime();
@@ -74,66 +70,54 @@ function postTick()
 		sec -= FirstPostTime;
 		return;
 	}
-	if (PostFinished == 1)
-	{
+	if (PostFinished == 1) {
 		PostFinished = 0;
 		postOneData(currentPostTime);
 	}
 }
 var FirstPostTime = 0;
-function postOneData(PostTime)
-{
+function postOneData(PostTime) {
 	$.ajax({
 		url: urlStr,
 		type: "POST",
 		data: dataStr + PostTime,
-		success: function (result)
-		{
-			if (result == "ok")
-			{
+		success: function (result) {
+			if (result == "ok") {
 				currentPostTime += 200;
 				log("Post " + PostTime + " OK");
 				PostFinished = 1;
-				if (FirstPostTime == 0)
-				{
+				if (FirstPostTime == 0) {
 					FirstPostTime = sec;
 				}
-			} else
-			{
+			} else {
 				console.dir(result);
 			}
 		},
-		error: function ()
-		{
+		error: function () {
 			log("Post " + PostTime + " Error");
 			PostFinished = 1;
 		}
 	});
 }
 
-function deleteFlashDiv()
-{
+function deleteFlashDiv() {
 	$("#player-container_wrapper").html("");
 }
-function InitTimerArea()
-{
+function InitTimerArea() {
 	TimerArea = document.getElementById("nav");
 	TimerArea.innerHTML = "";
 	sec = 0;
 	countInterval = setInterval(count, 1000);
 }
-function count()
-{
+function count() {
 	sec++;
 	TimerArea.innerText = sec + "" + "/" + videoLength;
-	if (sec >= videoLength + 20 && (sec - videoLength + 20) % 60 == 0)
-	{
+	if (sec >= videoLength + 20 && (sec - videoLength + 20) % 60 == 0) {
 		getfinish();
 	}
 }
 
-function getfinish()
-{
+function getfinish() {
 	logtoBackgroundPage("try finishing");
 
 	$.ajax({
@@ -141,33 +125,27 @@ function getfinish()
 		type: "POST",
 		url: urlStr,
 		data: dataStr + videoLength,
-		success: function (result)
-		{
-			if (result == "complete")
-			{
+		success: function (result) {
+			if (result == "complete") {
 				log("lessonIsCompelete");
 				SendNotification("第" + episode + "集 视频结束 正在前往下一集");
 				ReloadWaitingForInject();
-			} else if (result == "invalid")
-			{
+			} else if (result == "invalid") {
 				log("finishing failed " + result);
-				SendNotification("第" + episode + "集 结束失败 正在尝试刷新", "pss");
+				SendNotification("第" + episode + "集 结束失败 正在尝试刷新", "warning");
 				ReloadWaitingForInject();
-			} else if (result == "ok")
-			{
+			} else if (result == "ok") {
 				log("already Watch" + result);
-				SendNotification("第" + episode + "集 已经看过了 正在尝试刷新", "pss");
+				SendNotification("第" + episode + "集 已经看过了 正在尝试刷新", "warning");
 			}
 		}
 	});
 }
 
 var homeworkIsAlerted = 0;
-function dectHomework()
-{
+function dectHomework() {
 	homeworkIsAlerted = -1;
-	if (homeworkIsAlerted < 5)
-	{
+	if (homeworkIsAlerted < 5) {
 		homeworkTick();
 		homeworkTimer = setInterval(homeworkTick, 60000);
 	}
@@ -175,8 +153,7 @@ function dectHomework()
 
 //---------------interactions
 
-function SendStatus()
-{
+function SendStatus() {
 	sendToBackgroudFromWxxxVideo({
 		action: "Status",
 		currentTime: sec,
@@ -184,8 +161,7 @@ function SendStatus()
 	});
 }
 
-function goTohomeWork()
-{
+function goTohomeWork() {
 	logtoBackgroundPage("going to homework");
 	SendNotification("正在前往作业");
 	$("center")
@@ -196,20 +172,16 @@ function goTohomeWork()
 	clearInterval(PostTimer);
 }
 
-function ReloadWaitingForInject()
-{
+function ReloadWaitingForInject() {
 	$(".item.current").click();
-	setTimeout(() =>
-	{
+	setTimeout(() => {
 		window.location.reload();
 	}, 60000);
 }
 
-function logtoBackgroundPage(str, noforegroundlog)
-{
+function logtoBackgroundPage(str, noforegroundlog) {
 	noforegroundlog = arguments[1] ? noforegroundlog : false;
-	if (!noforegroundlog)
-	{
+	if (!noforegroundlog) {
 		log(str);
 	}
 	sendToBackgroudFromWxxxVideo({
@@ -218,22 +190,18 @@ function logtoBackgroundPage(str, noforegroundlog)
 	});
 }
 
-function homeworkTick()
-{
-	if (document.getElementById("assignmentInfo").innerText.length > 10)
-	{
+function homeworkTick() {
+	if (document.getElementById("assignmentInfo").innerText.length > 10) {
 		goTohomeWork();
 		clearInterval(homeworkTimer);
 	}
 }
 
-function sendToBackgroudFromWxxxVideo(data)
-{
+function sendToBackgroudFromWxxxVideo(data) {
 	sendToBackgroud(data, "WxxxVideo");
 }
 
-function Start()
-{
+function Start() {
 
 	log("codeWxxx.js Loaded");
 	getStrs();
@@ -249,43 +217,33 @@ function Start()
 //----------------------test-functions---------------
 
 function test1() { }
-function test2()
-{
+function test2() {
 	ClearAllTimers();
 }
 
-$(document).ready(function ()
-{
+$(document).ready(function () {
 	log("codeWxxx.js Loaded");
-	if ("undefined" == typeof urlStr)
-	{
+	if ("undefined" == typeof urlStr) {
 		Start();
-	} else
-	{
+	} else {
 		console.log("already started");
 	}
 });
-function detectOverWatch()
-{
-	try
-	{
-		if (episode == 1 && $("param[name=flashvars]").attr("value").split("&")[8].split("=")[1] == "true")
-		{
+function detectOverWatch() {
+	try {
+		if (episode == 1 && $("param[name=flashvars]").attr("value").split("&")[8].split("=")[1] == "true") {
 			SubjectOver();
 		}
-	} catch (error)
-	{
+	} catch (error) {
 
 	}
 
 }
-function SubjectOver()
-{
-	SendNotification("已完成  " + lessonName + "  所有视频");
+function SubjectOver() {
+	SendNotification("已完成  " + lessonName + "  所有视频", "finish");
 	goTohomeWorkList();
 }
-function goTohomeWorkList()
-{
+function goTohomeWorkList() {
 	clearInterval(PostTimer);
 	$(".assignmentIcon").parent().click();
 }
