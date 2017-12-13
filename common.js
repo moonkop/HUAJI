@@ -80,7 +80,7 @@ $(document).ready(function () {
 });
 function disableAlert() {
 	var script = document.createElement("script");
-	script.innerHTML = '<script> alert=comfirm=function(){}</script>';
+	script.innerHTML = 'alert=comfirm=function(){}';
 	document.body.appendChild(script);
 }
 
