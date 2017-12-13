@@ -312,7 +312,7 @@ function GoBack()
 	});
 
 	var str = document.referrer;
-	if (str.indexOf("manageVideo") != -1)
+	if (str.indexOf("manageAssignment") != -1 || str.indexOf("manageVideo") != -1)
 	{
 		$(".icon.videoIcon")
 			.parent()
