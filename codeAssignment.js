@@ -46,32 +46,25 @@ var AnswerTypeMap = {
 	"4": "DUO",
 	"100": "SKIP"
 };
-function doAssignments()
-{
+function doAssignments() {
 	getParams();
-	SendNotification("正在完成作业");
-	$.each(examStudentExerciseSerialList, function (index, value)
-	{
+	$.each(examStudentExerciseSerialList, function (index, value) {
 		log("working on No." + (index + 1));
 		tryAnswers(value.exerciseId, value.examStudentExerciseId);
 	});
-	if (examStudentExerciseSerialList.length != 0)
-	{
+	if (examStudentExerciseSerialList.length != 0) {
 		SendNotification("作业已完成");
 		handExam();
-	} else
-	{
-		SendNotification("作业中没有题目");
+	} else {
+		SendNotification("作业中没有题目", "error");
 	}
 
-	setTimeout(() =>
-	{
+	setTimeout(() => {
 		GoBack();
 	}, reloadTimeOut);
 }
 
-function handExam()
-{
+function handExam() {
 	getParams();
 	tryPost(
 		{
@@ -86,30 +79,25 @@ function handExam()
 			data: {},
 			dataType: "json"
 		},
-		function (result)
-		{
+		function (result) {
 			log("handExam" + result);
 		},
-		function (result)
-		{
+		function (result) {
 			log("handExamFailed");
 		}
 	);
 }
 
-function tryCurrentAnswers()
-{
+function tryCurrentAnswers() {
 	getParams();
 	tryAnswers(exerciseId, examStudentExerciseId);
 }
 
-function tryAnswers(exerciseId1, examStudentExerciseId1)
-{
+function tryAnswers(exerciseId1, examStudentExerciseId1) {
 	var answerMap;
 	var saveAnswerFun;
 
-	switch (AnswerTypeMap[getAnswerType(exerciseId1, examStudentExerciseId1)])
-	{
+	switch (AnswerTypeMap[getAnswerType(exerciseId1, examStudentExerciseId1)]) {
 		case "DX":
 			answerMap = DXanswerMap;
 			saveAnswerFun = saveDXAnswer;
@@ -132,13 +120,12 @@ function tryAnswers(exerciseId1, examStudentExerciseId1)
 			return;
 		default:
 			log("Error Type");
-			SendNotification("作业出错 重试中", "pss");
+			SendNotification("作业出错 重试中", "warning");
 			refresh();
 			break;
 	}
 
-	$.each(answerMap, function (index, value)
-	{
+	$.each(answerMap, function (index, value) {
 		var basicData = {
 			examReplyId: examReplyId,
 			examId: examId,
@@ -149,16 +136,14 @@ function tryAnswers(exerciseId1, examStudentExerciseId1)
 		saveAnswerFun(value, basicData);
 		log("tryAnswers " + value);
 		var IsCorrect = getAnswerInfo(exerciseId1, examStudentExerciseId1);
-		if (IsCorrect == true)
-		{
+		if (IsCorrect == true) {
 			log("---------  Answer is " + value + "---------------------");
 			return false;
 		}
 	});
 }
 
-function getParams()
-{
+function getParams() {
 	examReplyId = $("#examReplyId").val();
 	examStudentExerciseId = $("#examStudentExerciseId").val();
 	exerciseId = $("#exerciseId").val();
@@ -167,13 +152,11 @@ function getParams()
 	saveAnswerURL = $("#saveAnswerForm").attr("action");
 }
 
-function saveDXAnswer(AnswerOption, basicData)
-{
+function saveDXAnswer(AnswerOption, basicData) {
 	basicData["DXanswer"] = AnswerOption;
 	postAnswer(basicData);
 }
-function savePDAnswer(AnswerOption, basicData)
-{
+function savePDAnswer(AnswerOption, basicData) {
 	basicData["PDanswer"] = AnswerOption;
 	postAnswer(basicData);
 }
@@ -184,25 +167,20 @@ var DUOPostMap = {
 	D: "DuoXanswerD",
 	E: "DuoXanswerE"
 };
-function saveDUOAnswer(AnswerOption, basicData)
-{
+function saveDUOAnswer(AnswerOption, basicData) {
 	basicData["duoxAnswer"] = "";
-	$.each(AnswerOption, function (index, value)
-	{
+	$.each(AnswerOption, function (index, value) {
 		basicData[DUOPostMap[value]] = true;
-		if (value == "A")
-		{
+		if (value == "A") {
 			basicData["duoxAnswer"] += value;
-		} else
-		{
+		} else {
 			basicData["duoxAnswer"] += "," + value;
 		}
 	});
 	postAnswer(basicData);
 }
 
-function postAnswer(data)
-{
+function postAnswer(data) {
 	getParams();
 	tryPost({
 		type: "POST",
@@ -212,47 +190,38 @@ function postAnswer(data)
 	});
 }
 
-function tryPost(postContent, onsucceed, onerror)
-{
+function tryPost(postContent, onsucceed, onerror) {
 	var failtime = 0;
 	var PostSucceed = false;
-	postContent["error"] = function (result)
-	{
+	postContent["error"] = function (result) {
 		log("Post failed");
 		failtime++;
 		PostSucceed = false;
-		if (onerror != undefined)
-		{
+		if (onerror != undefined) {
 			onerror(result);
 		}
 	};
-	postContent["success"] = function (result)
-	{
-		if (onsucceed != undefined)
-		{
+	postContent["success"] = function (result) {
+		if (onsucceed != undefined) {
 			onsucceed(result);
 		}
 		PostSucceed = true;
 	};
-	while (PostSucceed == false && failtime < 100)
-	{
+	while (PostSucceed == false && failtime < 100) {
 		$.ajax(postContent);
 	}
-	if (failtime > 100)
-	{
-		SendNotification("服务器炸了作业不能做", "pss");
+	if (failtime > 100) {
+		SendNotification("服务器炸了作业不能做", "warning");
 		throw "Server Is Unavailable";
 	}
 }
 
-function getCurrentAnswerInfo()
-{
+function getCurrentAnswerInfo() {
 	getParams();
 	return getAnswerInfo(exerciseId, examStudentExerciseId);
 }
 
-function getAnswerInfo(exerciseId1, examStudentExerciseId1)
-{
+function getAnswerInfo(exerciseId1, examStudentExerciseId1) {
 	var IsCorrect = false;
 
 	tryPost(
@@ -267,16 +236,14 @@ function getAnswerInfo(exerciseId1, examStudentExerciseId1)
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function (result)
-		{
+		function (result) {
 			IsCorrect = result.examAnswer.correctFlag;
 		}
 	);
 	return IsCorrect;
 }
 
-function getAnswerType(exerciseId1, examStudentExerciseId1)
-{
+function getAnswerType(exerciseId1, examStudentExerciseId1) {
 	var type;
 	tryPost(
 		{
@@ -290,13 +257,10 @@ function getAnswerType(exerciseId1, examStudentExerciseId1)
 			dataType: "json", //接受数据格式
 			async: false
 		},
-		function (result)
-		{
-			if (result.examAnswer.correctFlag == true)
-			{
+		function (result) {
+			if (result.examAnswer.correctFlag == true) {
 				type = 100;
-			} else
-			{
+			} else {
 				type = result.type;
 			}
 		}
@@ -304,63 +268,51 @@ function getAnswerType(exerciseId1, examStudentExerciseId1)
 	return type;
 }
 
-function GoBack()
-{
+function GoBack() {
 	sendToBackgroud({
 		action: "WaitInject",
 		script: "codeWxxx.js"
 	});
 
 	var str = document.referrer;
-	if (str.indexOf("manageVideo") != -1)
-	{
+	if (str.indexOf("manageVideo") != -1) {
 		$(".icon.videoIcon")
 			.parent()
 			.click();
-	} else
-	{
+	} else {
 		window.location.href = document.referrer;
 	}
 }
-function sendToBackgroud(data)
-{
+function sendToBackgroud(data) {
 	data.pageName = "Assignment";
 	chrome.runtime.sendMessage(data);
 }
 
-function inject()
-{
+function inject() {
 	var script = document.createElement("script");
 	script.innerHTML = 'window.postMessage(examStudentExerciseSerialList, "*");';
 	document.body.appendChild(script);
 }
-function refresh()
-{
+function refresh() {
 	window.location.reload();
 }
-function Start()
-{
-	setTimeout(() =>
-	{
+function Start() {
+	setTimeout(() => {
 		doAssignments();
 	}, 3000);
 }
 
-$(document).ready(function ()
-{
+$(document).ready(function () {
 	log("codeAssignment.js Loaded");
 	window.addEventListener(
 		"message",
-		function (event)
-		{
+		function (event) {
 			// We only accept messages from ourselves
 			if (event.source != window) return;
 			examStudentExerciseSerialList = event.data;
-			if (examReplyId != "")
-			{
+			if (examReplyId != "") {
 				Start();
-			} else
-			{
+			} else {
 				log("already started");
 			}
 		},

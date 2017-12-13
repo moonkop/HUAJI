@@ -26,7 +26,7 @@ $(document).ready(
                 break;
             case 1:
                 log("Assignments All Over back to Main Page");
-                SendNotification("作业全部完成正在回到课程主页", "xk", true);
+                SendNotification("作业全部完成正在回到课程主页", "finish");
                 goToCourseHomePage();
                 break;
             case 2:
