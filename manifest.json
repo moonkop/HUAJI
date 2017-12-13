@@ -1,6 +1,6 @@
-﻿{
+{
 	"name": "学习软件",
-	"version": "6.0.0",
+	"version": "6.3.1",
 	"description": "一个会自动学习视频的软件.",
 	"permissions": [
 		"tabs",
@@ -77,7 +77,7 @@
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 	"manifest_version": 3,
 	"browser_action": {
-		"default_title": "我去你妈的网修课",
+		"default_title": "吃饭睡觉挂网修课",
 		"default_icon": "icon.png",
 		"default_popup": "popup.html"
 	},

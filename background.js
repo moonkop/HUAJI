@@ -1,23 +1,31 @@
 var tabid;
 var dectLoadFinishedTimer;
 
-var iconMap = {
-	hj: "icon.png",
-	pss: "pss.png",
-	xk: "xk.png"
+var NotificationLevelIconMap = {
+	"tip": "icon.png",
+	"warning": "pss.png",
+	"finish": "xk.png",
+	"error": "sq.png"
+};
+var NotificationLevelPriorityMap = {
+	"tip": 0,
+	"warning": 0,
+	"finish": 2,
+	"error": 2
+};
+
+var NotificationLevelRequireInteractionMap = {
+	"tip": false,
+	"warning": false,
+	"finish": false,
+	"error": true
 };
 
 var defaultLessonType = "";
 var settings = {
 	ReloadTimeOut: 20000
 };
-function test2() {
-	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-		var tagtab = tabs[0];
-		//	RecordTabStatus(tagtab.id);
-		WaitingForInjection(tagtab.id, "codeWxxx.js");
-	});
-}
+
 function doAssignments() {
 	chrome.tabs.executeScript(null, { file: "codeAssignment.js" });
 }
@@ -114,15 +122,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender) {
 
 	switch (msg.action) {
 		case "Notification":
-			popNotification({
-				type: "basic",
-				title: msg.UserId + "   " + msg.UserName,
-				message: msg.Notification,
-				iconUrl: iconMap[msg.icon],
-				requireInteraction: msg.requireInteraction
-			});
+			popNotification(msg.UserId + "   " + msg.UserName, msg.Notification, msg.level)
 			break;
-
 		case "Log":
 			log(
 				"tabId=" +
@@ -197,6 +198,41 @@ function startNewSzjy() {
 	Inject(null, "Szjy");
 }
 
-function popNotification(opt) {
-	chrome.notifications.create(null, opt);
+function popNotification(title, message, level) {
+	chrome.notifications.create(null, {
+		type: "basic",
+		title: title,
+		message: message,
+		iconUrl: NotificationLevelIconMap[level],
+		priority: NotificationLevelPriorityMap[level],
+		requireInteraction: NotificationLevelRequireInteractionMap[level]
+	});
+}
+function test21() {
+	chrome.notifications.getAll(function (obj) {
+		console.dir(obj);
+	});
+}
+function clearAllNoti() {
+	chrome.notifications.getAll(function (obj) {
+		for (var key in obj) {
+			chrome.notifications.clear(key);
+		}
+	});
+}
+function tabtest() {
+	chrome.tabs.query({
+
+	},
+		function (tabs) {
+			console.dir(tabs);
+		});
+}
+function highlighttest(tabid) {
+	chrome.tabs.get(tabid, function (tab) {
+		chrome.tabs.highlight({ 'tabs': tab.index }, function () { });
+	});
+}
+function test2() {
+	highlighttest(357);
 }
