@@ -14,8 +14,11 @@ $(document).ready(
                 allover = 2;
                 var str = $(this).attr("href");
                 if (str.indexOf("manageAssignment") != -1) {
-                    allover = 0;
-                    window.location.href = str;
+					allover = 0;
+					setTimeout(() => {
+						window.location.href = str;
+
+					}, 5000);
                     return 0;
                 }
             }
