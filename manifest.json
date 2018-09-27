@@ -24,6 +24,15 @@
 				"code502.js"
 			],
 			"run_at": "document_end"
+		},{
+			"matches": [
+				"http://szjz.hytc.edu.cn/student/openTeaching.do*"
+			],
+			"js": [
+				"jquery-1.3.2.min.js",
+				"codeSzjy.js"
+			],
+			"run_at": "document_end"
 		},
 		{
 			"matches": [
@@ -34,18 +43,7 @@
 			],
 			"run_at": "document_end"
 		},
-		{
-			"matches": [
-				"http://www.moonkop.com/*"
-			],
-			"js": [
-				"jquery-1.3.2.min.js",
-				"code502.js",
-				"common.js",
-				"codeAssignment.js"
-			],
-			"run_at": "document_end"
-		},
+
 		{
 			"matches": [
 				"http://wxxx.hytc.edu.cn/student/video/*"
