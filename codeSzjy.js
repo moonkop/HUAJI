@@ -7,6 +7,11 @@ var TimerArea;
 var statusBar;
 var countInterval;
 var homeworkTimer;
+
+var episode;
+var episodeNum;
+
+
 function getfinish() {
     logtoBackgroundPage("try finishing");
 
@@ -59,7 +64,7 @@ var PostFinished = 1;
 function postTick() {
     if (currentPostTime > videoLength) {
         clearInterval(PostTimer);
-     
+
         newdate.setTime(ts + 1000 * (videoLength + 20));
         log_Clear();
         return;
@@ -110,8 +115,12 @@ function init() {
     var regxData = RegExp("isOpen.*=", "g");
     var regxTime = /\d+(?=&playTime)/
     var Script = $(".content_bg_1").children().eq(3).html();
+    var regEpisode = /\d+/;
+
     urlStr = (regxUrl.exec(Script))[0];
     dataStr = (regxData.exec(Script))[0];
+    episode = regEpisode.exec($("font").html());
+    episodeNum = regEpisode.exec($(".nav_info").html());
     videoLength = Number(regxTime.exec(dataStr));
     countInterval = setInterval(count, 1000);
     sec = 0;
@@ -127,9 +136,7 @@ function initDisplayArea() {
 function count() {
     sec++;
     TimerArea.innerText = sec + "" + "/" + videoLength;
-    if (sec > videoLength + 20 && sec % 10 == 0) {
-        getfinish();
-    }
+    setEposideProgress(sec * 1.0 / videoLength);
 }
 
 
@@ -141,7 +148,7 @@ function dectHomework() {
 function logtoBackgroundPage(str, noforegroundlog) {
     noforegroundlog = arguments[1] ? noforegroundlog : false;
     if (!noforegroundlog) {
-        statusBar.innerHTML += str + '<br>';
+        log(str);
     }
     sendToBackgroud({
         action: "Log",
@@ -164,25 +171,22 @@ function disableFlash() {
 function Run() {
 
     log("codeWxxx.js Loaded");
+    ClearAllTimers();
     initDisplayArea();
     logtoBackgroundPage("starting");
     disableFlash();
-    // 停止计时器
-    disableTimers();
     init();
     postAll();
+    setTotalProgress(episode * 1.0 / episodeNum);
 
 }
-
-function disableTimers() {
-    for (var i = 0; i < 100; i++) {
-        clearInterval(i);
+$(document).ready(function () {
+    if ("undefined" == typeof (urlStr)) {
+        console.log("starting");
+        Run();
+    } else {
+        console.log("already started");
     }
 }
+)
 
-if ("undefined" == typeof (urlStr)) {
-    console.log("starting");
-    Run();
-} else {
-    console.log("already started");
-}

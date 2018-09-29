@@ -58,10 +58,38 @@ function log_Clear() {
 }
 
 function initLogArea() {
-	var str =
-		'<div id="mask" style="background: rgba(255,255,255,0.7);float: left;z-index: 2;position: absolute;">	<div id="log-body" style="min-width: 100px;width: auto;min-height: 0;height: auto;border: 1px solid #DDDDDD;opacity: 2;"></div>	</div>';
+	var str = `<div style="
+position: fixed;
+width: 100%;
+"><div style="
+height: 10px;
+background-color: #FFF;">
+<div  id="progress_total"
+style="
+background-color: #4f5dd5;
+width: 0%;
+height: 5px;">
+</div>
+<div id="progress_eposide"
+style="
+background-color: #4fd5a3;
+width: 0%;
+height: 5px;">
+</div>
+</div>
+<div style="background: rgba(255,255,255,0.8);float: left;">	
+<div id="log-body" style="min-width: 100px;width: auto;min-height: 0;height: auto;border: 1px solid #DDDDDD;opacity: 2;">
+</div></div>`
 	$("body").prepend(str);
+
+
 	LogArea = document.getElementById("log-body");
+}
+function setTotalProgress(percent) {
+	$("#progress_total").css("width", percent*100 + "%")
+}
+function setEposideProgress(percent) {
+	$("#progress_eposide").css("width", percent*100 + "%")
 }
 
 function disableAlert() {
@@ -69,6 +97,13 @@ function disableAlert() {
 	script.innerHTML = 'alert=comfirm=function(){}';
 	document.body.appendChild(script);
 }
+function ClearAllTimers() {
+	for (var i = 0; i < 100; i++) {
+
+		clearInterval(i);
+	}
+}
+
 
 initLogArea();
 disableAlert();
