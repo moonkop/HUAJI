@@ -211,12 +211,17 @@ function sendToBackgroud(data) {
     data.lessonType = "Szjy";
     chrome.runtime.sendMessage(data);
 }
+function disableFlash()
+{
+    $("#player-container_wrapper").remove();
 
+}
 
 
 function Run() {
     initDisplayArea();
     logtoBackgroundPage("starting");
+disableFlash();
 
     // 停止计时器
     clearInterval(4); //停止系统自带上传进度计时器
