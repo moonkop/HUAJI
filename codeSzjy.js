@@ -33,12 +33,16 @@ function getfinish() {
     });
 }
 
-var PostInterval = 120;
+var PostInterval = 60;
 var PostTimer;
-function postAll() {
+var currentPostTime = 0;
+var PostFinished = 1;
+
+function setUpPostTimer() {
     var mydate = new Date();
     var ts = mydate.getTime();
     var newdate = new Date();
+    newdate.setTime(ts + 1000 * (videoLength + 20));
     logtoBackgroundPage(
         "\n<br>started on " +
         mydate.getHours() +
@@ -57,16 +61,12 @@ function postAll() {
     );
 
     postTick();
-    PostTimer = setInterval(postTick, 60 * 1000);
+    PostTimer = setInterval(postTick, PostInterval * 1000);
 }
-var currentPostTime = 0;
-var PostFinished = 1;
+
 function postTick() {
     if (currentPostTime > videoLength) {
         clearInterval(PostTimer);
-
-        newdate.setTime(ts + 1000 * (videoLength + 20));
-        log_Clear();
         return;
     }
     if (PostFinished == 1) {
@@ -84,7 +84,7 @@ function postOneData(PostTime) {
             log("Post " + PostTime + " " + result);
             switch (result) {
                 case "ok":
-                    currentPostTime += 60;
+                    currentPostTime += PostInterval;
                     PostFinished = 1;
                     break;
                 case "complete":
@@ -176,7 +176,7 @@ function Run() {
     logtoBackgroundPage("starting");
     disableFlash();
     init();
-    postAll();
+    setUpPostTimer();
     setTotalProgress(episode * 1.0 / episodeNum);
 
 }

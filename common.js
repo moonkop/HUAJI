@@ -50,6 +50,8 @@ function SendNotification(note, level) {
 var LogArea;
 function log(str) {
 	LogArea.innerHTML += str + "<br>";
+	var offset= $("#log-body").height()-$("#log-body").parent().height()
+	$("#log-body").parent().scrollTop(offset);
 	console.log(str);
 }
 
@@ -77,9 +79,9 @@ width: 0%;
 height: 5px;">
 </div>
 </div>
-<div style="background: rgba(255,255,255,0.8);float: left;">	
-<div id="log-body" style="min-width: 100px;width: auto;min-height: 0;height: auto;border: 1px solid #DDDDDD;opacity: 2;">
-</div></div>`
+<div style="min-width: 100px;width: auto;min-height: 0;height: auto;opacity: 2;position: fixed;top: 10px;bottom: 0;overflow: auto;">
+<div id="log-body"  style="background: rgba(255,255,255,0.8);"> </div>
+</div>`
 	$("body").prepend(str);
 
 

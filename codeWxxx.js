@@ -15,7 +15,6 @@ function getStrs() {
 	var regxData = RegExp("teachingTaskId.*=", "g");
 	var regxTime = /\d+(?=&playTime)/;
 	var regEpisode = /\d+/;
-	var userstr = document.getElementsByClassName("bottom")[0].innerText;
 	var Script = document.getElementsByClassName("content_bg")[0].children[2]
 		.innerText;
 	episode = regEpisode.exec($("font").html());
