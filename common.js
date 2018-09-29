@@ -7,18 +7,7 @@ function GetQueryString(name) {
 		return unescape(r[2]);
 	return null;
 }
-function getUserInfo() {
-	var regxName = /[\u4e00-\u9fa5]+(?=\s+【)/;
-	var regxId = /\d+(?=\s+姓名)/;
-	try {
-		var userstr = document.getElementsByClassName("bottom")[0].innerText;
-		username = regxName.exec(userstr)[0];
-		userid = regxId.exec(userstr)[0];
-		log(username + "  " + userid);
-	} catch (error) {
-		log("cant get user name and id");
-	}
-}
+
 function goToCourseHomePage() {
 	if (GetQueryString("courseId") != null) {
 		window.location.href = "student/teachingTask/coursehomepage.do?courseId=" + GetQueryString("courseId");
@@ -75,9 +64,6 @@ function initLogArea() {
 	LogArea = document.getElementById("log-body");
 }
 
-$(document).ready(function () {
-	getUserInfo();
-});
 function disableAlert() {
 	var script = document.createElement("script");
 	script.innerHTML = 'alert=comfirm=function(){}';

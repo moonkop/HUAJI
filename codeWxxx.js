@@ -25,6 +25,19 @@ function getStrs() {
 	dataStr = regxData.exec(Script)[0];
 	videoLength = Number(regxTime.exec(dataStr));
 }
+function getUserInfo() {
+	var regxName = /[\u4e00-\u9fa5]+(?=\s+【)/;
+	var regxId = /\d+(?=\s+姓名)/;
+	try {
+		var userstr = document.getElementsByClassName("bottom")[0].innerText;
+		username = regxName.exec(userstr)[0];
+		userid = regxId.exec(userstr)[0];
+		log(username + "  " + userid);
+	} catch (error) {
+		log("cant get user name and id");
+	}
+}
+
 
 var PostTimer;
 function postAll() {
@@ -204,6 +217,7 @@ function sendToBackgroudFromWxxxVideo(data) {
 function Start() {
 
 	log("codeWxxx.js Loaded");
+	getUserInfo();
 	getStrs();
 	detectOverWatch();
 	deleteFlashDiv();
