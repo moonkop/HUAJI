@@ -3,7 +3,6 @@ var urlStr;
 var dataStr;
 var username;
 var userid;
-var sec;
 var TimerArea;
 var statusBar;
 var countInterval;
@@ -41,33 +40,89 @@ function getfinish() {
 }
 
 var PostInterval = 120;
-
-function getToEnd() {
-    log("skipping to end");
-    var counts = videoLength / PostInterval;
-    for (var i = 1; i < counts; i++) {
-        postData(i * PostInterval);
-    }
-    var mydate = new Date();
-    var ts = mydate.getTime();
-    var newdate = new Date();
-    newdate.setTime(ts + 1000 * (videoLength + 20));
-    logtoBackgroundPage("skipping finished on " + mydate.getHours() + ":" + mydate.getMinutes() + ":" + mydate.getSeconds() + "   Completing on " + newdate.getHours() + ":" + newdate.getMinutes() + ":" + newdate.getSeconds());
-
+var PostTimer;
+function postAll() {
+    log("watching");
+    postTick();
+    PostTimer = setInterval(postTick, 60*1000);
 }
-
-function postData(time) {
-
+var currentPostTime = 0;
+var PostFinished = 1;
+function postTick() {
+    if (currentPostTime > videoLength) {
+        clearInterval(PostTimer);
+        var mydate = new Date();
+        var ts = mydate.getTime();
+        var newdate = new Date();
+        newdate.setTime(ts + 1000 * (videoLength + 20));
+        log_Clear();
+        logtoBackgroundPage(
+            userid +
+            " " +
+            username +
+            "  " +
+            episode +
+            "/" +
+            episodeNum +
+            "\n<br>" +
+            lessonName +
+            "\n<br>skipping finished on " +
+            mydate.getHours() +
+            ":" +
+            mydate.getMinutes() +
+            ":" +
+            mydate.getSeconds() +
+            "\n<br> Completing on " +
+            newdate.getHours() +
+            ":" +
+            newdate.getMinutes() +
+            ":" +
+            newdate.getSeconds() +
+            "\n<br>Length=" +
+            videoLength
+        );
+        return;
+    }
+    if (PostFinished == 1) {
+        PostFinished = 0;
+        postOneData(currentPostTime);
+    }
+}
+var FirstPostTime = 0;
+function postOneData(PostTime) {
     $.ajax({
-        async: false,
-        type: "POST",
         url: urlStr,
-        data: dataStr + time,
-        success: function(result) {
-            console.log("time=" + time + "result:" + result);
-            if (result == "complete") {
-                RequestReload();
+        type: "POST",
+        data: dataStr + PostTime,
+        success: function (result) {
+            log("Post " + PostTime + " "+result);
+            switch(result)
+            {
+case "ok": 
+currentPostTime += 60;
+PostFinished = 1;
+break;
+case "complete": 
+window.location.reload();
+break;
+case "invalid": 
+currentPostTime=0;
+PostFinished = 1;
+break;
+
             }
+
+
+
+            if (result == "ok") {
+               
+            } else {
+                console.dir(result);
+            }
+        },
+        error: function () {
+
+            PostFinished = 0;
         }
     });
 }
@@ -168,7 +223,7 @@ function Run() {
     clearInterval(1); //停止焦点状态检测计时器
     clearInterval(3); //停止时间记录计时器
     init();
-    getToEnd();
+    postAll();
     // var aliveSenderTimer=setInterval(SendAlive,30000);
 }
 
