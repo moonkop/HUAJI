@@ -213,7 +213,9 @@ function sendToBackgroud(data) {
 }
 function disableFlash()
 {
-    $("#player-container_wrapper").remove();
+  
+        $("#player-container").remove();
+ 
 
 }
 
@@ -224,15 +226,19 @@ function Run() {
 disableFlash();
 
     // 停止计时器
-    clearInterval(4); //停止系统自带上传进度计时器
-    clearInterval(1); //停止焦点状态检测计时器
-    clearInterval(3); //停止时间记录计时器
+disableTimers();
     init();
     postAll();
     // var aliveSenderTimer=setInterval(SendAlive,30000);
 }
 
+function disableTimers()
+{
+    for(var i =0;i<100;i++){
+clearInterval(i);
 
+    }
+}
 
 if ("undefined" == typeof(urlStr)) {
     console.log("starting");
