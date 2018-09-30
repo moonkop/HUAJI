@@ -66,6 +66,7 @@ function setUpPostTimer() {
 
 function postTick() {
     if (currentPostTime > videoLength) {
+        postOneData(videoLength)
         clearInterval(PostTimer);
         return;
     }
